@@ -48,13 +48,16 @@ export default {
           clearTimeout(this.retryTimer);
           this.retryTimer = null;
         }
-        this.startApp(web3);
+        const eth = new Eth(web3.currentProvider);
+        this.startApp(eth);
       } else {
+        /* if use testrpc instead */
+        // const eth = new Eth(new Eth.HttpProvider('http://localhost:8545'));
+        // this.startApp(eth);
         this.retryTimer = setTimeout(this.initApp, 3000);
       }
     },
-    startApp() {
-      const eth = new Eth(new Eth.HttpProvider('http://localhost:8545'));
+    startApp(eth) {
       this.eth = eth;
       const contract = new EthContract(eth);
       eth.accounts().then((accounts) => {
