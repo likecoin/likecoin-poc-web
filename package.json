@@ -11,9 +11,11 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
+    "axios": "^0.17.0",
     "ethjs": "^0.2.8",
     "ethjs-contract": "^0.1.9",
     "vue": "^2.5.2",
+    "vue-material": "^0.7.5",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

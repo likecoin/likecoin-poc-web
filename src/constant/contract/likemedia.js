@@ -1,6 +1,47 @@
 /* eslint-disable */
 export const LIKE_MEDIA_ABI = [
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "key",
+        "type": "bytes32"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "name": "ipfs",
+        "type": "string"
+      },
+      {
+        "name": "footprintKeys",
+        "type": "bytes32[]"
+      },
+      {
+        "name": "footprintShares",
+        "type": "uint8[]"
+      },
+      {
+        "name": "license",
+        "type": "string"
+      }
+    ],
+    "name": "upload",
+    "outputs": [],
+    "payable": false,
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [
       {
@@ -67,7 +108,7 @@ export const LIKE_MEDIA_ABI = [
       },
       {
         "name": "i",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "name": "l",
@@ -109,7 +150,7 @@ export const LIKE_MEDIA_ABI = [
       },
       {
         "name": "ipfs",
-        "type": "bytes"
+        "type": "string"
       },
       {
         "name": "license",
@@ -128,55 +169,10 @@ export const LIKE_MEDIA_ABI = [
     "type": "function"
   },
   {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "key",
-        "type": "bytes32"
-      },
-      {
-        "name": "author",
-        "type": "string"
-      },
-      {
-        "name": "description",
-        "type": "string"
-      },
-      {
-        "name": "wallet",
-        "type": "address"
-      },
-      {
-        "name": "ipfs",
-        "type": "bytes"
-      },
-      {
-        "name": "footprintKeys",
-        "type": "bytes32[]"
-      },
-      {
-        "name": "footprintShares",
-        "type": "uint8[]"
-      },
-      {
-        "name": "license",
-        "type": "string"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "upload",
-    "outputs": [],
-    "payable": false,
-    "type": "function"
-  },
-  {
     "inputs": [],
     "payable": false,
     "type": "constructor"
   }
 ];
 
-export const LIKE_MEDIA_ADDRESS = '0x675661443b04849ca6ac992436a713e11cb0e161';
+export const LIKE_MEDIA_ADDRESS = '0xfE4c0cbD9c7f7504626C8d8dC0B68e3a3FDA51af';
