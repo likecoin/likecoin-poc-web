@@ -44,19 +44,17 @@ class EthHelper {
         /* eslint-disable no-await-in-loop */
         txReceipt = await this.eth.getTransactionReceipt(txHash);
       } catch (err) {
-        return console.log(`ERROR: ${err}`);
+        console.log(`ERROR: ${err}`);
+        if (cb) cb(err);
       }
     }
-    return () => {
-      console.log('YES');
-      if (cb) cb();
-    };
+    console.log('YES');
+    if (cb) cb();
   }
 
   onClick(format, cb) {
     if (!this.likeContract) return;
     const { id, author, wallet, description, license, footprints, ipfs } = format;
-    console.log(footprints);
     const footprintsArray = JSON.parse(footprints);
     const footprintKeys = footprintsArray.map(f => f.id);
     const footprintValues = footprintsArray.map(f => f.value);
@@ -79,11 +77,9 @@ class EthHelper {
     .catch(console.error);
   }
 
-  onClickGet() {
+  onClickGet(uid) {
     if (!this.likeContract) return;
-    this.likeContract.get(
-      '0x4d61726b65745061792e696f206973206465706c6f79696e6720536d61727420',
-      )
+    this.likeContract.get(uid)
     .then((info) => {
       console.dir(info);
     })

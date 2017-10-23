@@ -102,7 +102,10 @@ export default {
     onSubmit() {
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {
-        EthHelper.onClick(result.data);
+        EthHelper.onClick(result.data, (err) => {
+          if (err) return;
+          this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
+        });
       });
     },
   },
