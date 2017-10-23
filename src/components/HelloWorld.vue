@@ -4,7 +4,7 @@
     <router-view/>
     <h2>Essential Links</h2>
     <ul>
-      <li><router-link :to="{ name: 'UploadImage', params: { wallet } }">
+      <li><router-link :to="{ name: 'UploadImage' }">
         Upload Image
       </router-link></li>
     </ul>

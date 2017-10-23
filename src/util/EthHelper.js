@@ -37,7 +37,7 @@ class EthHelper {
     });
   }
 
-  async waitForTxToBeMined(txHash) {
+  async waitForTxToBeMined(txHash, cb) {
     let txReceipt;
     while (!txReceipt) {
       try {
@@ -47,28 +47,34 @@ class EthHelper {
         return console.log(`ERROR: ${err}`);
       }
     }
-    return console.log('YES');
+    return () => {
+      console.log('YES');
+      if (cb) cb();
+    };
   }
 
-  onClick() {
+  onClick(format, cb) {
     if (!this.likeContract) return;
-    const key = '0x4d61726b65745061792e696f206973206465706c6f79696e6720536d61727420';
+    const { id, author, wallet, description, license, footprints, ipfs } = format;
+    console.log(footprints);
+    const footprintsArray = JSON.parse(footprints);
+    const footprintKeys = footprintsArray.map(f => f.id);
+    const footprintValues = footprintsArray.map(f => f.value);
     this.likeContract.upload(
-      key,
-      'Michael',
-      'Test upload',
-      '0x83D3F8effbf3924D34F51531ce57C97C9fA2E5CF',
-      '0x4d61726b65745061792e696f206973206465706c6f79696e6720536d61727421',
-      ['0x4d61726b65745061792e696f206973206465706c6f79696e6720536d61727421',
-        '0x4d61726b65745061792e696f206973206465706c6f79696e6720536d61727422'],
-      [20, 15],
-      'CC-by',
+      id,
+      author,
+      description,
+      wallet,
+      ipfs,
+      footprintKeys,
+      footprintValues,
+      license,
       { from: this.accounts[0], gas: 900000, data: '0x' },
     )
     .then((txHash) => {
       console.log('Transaction sent');
       console.dir(txHash);
-      this.waitForTxToBeMined(this.eth, txHash);
+      this.waitForTxToBeMined(txHash, cb);
     })
     .catch(console.error);
   }
@@ -82,6 +88,10 @@ class EthHelper {
       console.dir(info);
     })
     .catch(console.error);
+  }
+
+  getWallet() {
+    return this.wallet;
   }
 }
 export default new EthHelper();

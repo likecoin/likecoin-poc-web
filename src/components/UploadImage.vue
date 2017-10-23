@@ -31,7 +31,7 @@
       <md-button class="md-icon-button" @click.native="addFootprint">
         <md-icon>playlist_add</md-icon>
       </md-button></h2>
-      <div v-for="f in footprints" :key="f.id">
+      <div v-for="f in footprints">
         <md-input-container>
           <label>Refernce Image UID</label>
           <md-input v-model="f.id"></md-input>
@@ -54,11 +54,12 @@
 
 <script>
 import defaultImage from '@/assets/logo.png';
+
+import EthHelper from '@/util/EthHelper';
 import * as api from '@/api/api';
 
 export default {
   name: 'UploadImage',
-  props: ['wallet'],
   data() {
     return {
       imageData: defaultImage,
@@ -68,12 +69,19 @@ export default {
       description: '',
       license: '',
       footprints: [],
+      wallet: EthHelper.getWallet(),
     };
   },
   methods: {
     getSerializedMetaData() {
       const { imageFile, author, wallet, description, license, footprints } = this;
-      return { image: imageFile, author, wallet, description, license, footprints };
+      return { image: imageFile,
+        author,
+        wallet,
+        description,
+        license,
+        footprints: JSON.stringify(footprints),
+      };
     },
     previewImage(files) {
       if (files && files[0]) {
@@ -92,8 +100,20 @@ export default {
       this.footprints.pop();
     },
     onSubmit() {
-      api.apiPostUploadImage(this.getSerializedMetaData());
+      api.apiPostUploadImage(this.getSerializedMetaData())
+      .then((result) => {
+        EthHelper.onClick(result.data);
+      });
     },
+  },
+  mounted() {
+    if (!this.wallet) {
+      setTimeout(() => {
+        if (!this.wallet && EthHelper.getWallet()) {
+          this.wallet = EthHelper.getWallet();
+        }
+      }, 3000);
+    }
   },
 };
 </script>
