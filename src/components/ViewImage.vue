@@ -6,6 +6,7 @@
         <span>{{ key }} : {{ value }}</span>
       </li>
     </ul>
+    <a v-for="k in footprints" @click="onFootprintClick(k)"> {{ k }}</a>
   </div>
 </template>
 
@@ -26,28 +27,31 @@ export default {
     imgUrl() {
       return `https://ipfs.io/ipfs/${this.ipfsHash}`;
     },
+    footprints() {
+      return this.metadata.footprintIds;
+    },
+  },
+  methods: {
+    refreshImage(newUid) {
+      const uid = newUid;
+      if (!this.ipfsHash || this.uid !== uid) {
+        api.apiGetMetadata(uid)
+        .then((result) => {
+          this.metadata = result.data;
+          this.ipfsHash = result.data.ipfs;
+          this.uid = uid;
+        });
+      }
+    },
+    onFootprintClick(uid) {
+      this.$router.push({ name: 'ViewImage', params: { uid } });
+    },
   },
   mounted() {
-    const uid = this.$route.params.uid;
-    if (!this.ipfsHash || this.uid !== uid) {
-      api.apiGetMetadata(uid)
-      .then((result) => {
-        this.metadata = result.data;
-        this.ipfsHash = result.data.ipfs;
-        this.uid = uid;
-      });
-    }
+    this.refreshImage(this.$route.params.uid);
   },
   beforeRouteUpdate(to, from, next) {
-    const uid = to.params.uid;
-    if (!this.ipfsHash || this.uid !== uid) {
-      api.apiGetMetadata(to.params.uid)
-      .then((result) => {
-        this.metadata = result.data;
-        this.ipfsHash = result.data.ipfs;
-        this.uid = uid;
-      });
-    }
+    this.refreshImage(to.params.uid);
     next();
   },
 };
