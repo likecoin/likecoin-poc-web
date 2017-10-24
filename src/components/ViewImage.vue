@@ -17,6 +17,7 @@ export default {
   data() {
     return {
       msg: 'Welcome to Your Vue.js App',
+      uid: '',
       ipfsHash: '',
       metadata: {},
     };
@@ -27,14 +28,27 @@ export default {
     },
   },
   mounted() {
-    if (!this.ipfsHash) {
-      api.apiGetMetadata(this.$route.params.uid)
+    const uid = this.$route.params.uid;
+    if (!this.ipfsHash || this.uid !== uid) {
+      api.apiGetMetadata(uid)
       .then((result) => {
         this.metadata = result.data;
         this.ipfsHash = result.data.ipfs;
-        console.log(this.metadata);
+        this.uid = uid;
       });
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    const uid = to.params.uid;
+    if (!this.ipfsHash || this.uid !== uid) {
+      api.apiGetMetadata(to.params.uid)
+      .then((result) => {
+        this.metadata = result.data;
+        this.ipfsHash = result.data.ipfs;
+        this.uid = uid;
+      });
+    }
+    next();
   },
 };
 </script>
