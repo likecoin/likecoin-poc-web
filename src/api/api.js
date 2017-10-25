@@ -11,4 +11,7 @@ export const apiPostUploadImage = (form) => {
   return axios.post(`${HOST}/upload`, params);
 };
 
+export const apiPostMeme = (uid, text, metadata) =>
+  axios.post(`${HOST}/meme/${uid}`, { text, metadata });
+
 export const apiGetMetadata = uid => axios.get(`${HOST}/query/${uid}`);
