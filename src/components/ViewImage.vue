@@ -1,12 +1,24 @@
 <template>
   <div class="view">
-    <img :src="imgUrl" />
+    <md-layout md-gutter>
+    <md-layout md-align="center"
+      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+      md-flex-large="40" md-flex-offset-large="5"
+      md-flex-xlarge="40" md-flex-offset-xlarge="5">
+    <div class="image-view">
+      <img :src="imgUrl" />
+    </div>
     <div v-if="isMemeing"></div>
-    <md-button @click="isMemeing=!isMemeing"> MEME! </md-button>
-    <form id="imageMetadata" v-if="isMemeing" v-on:submit.prevent="onSubmit">
+    </md-layout>
+    <md-layout md-column md-gutter
+      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+      md-flex="50">
+    <md-card v-if="isMemeing">
+    <md-card-content>
+    <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Meme</label>
-        <md-input v-model="memeText"></md-input>
+        <md-textarea v-model="memeText"></md-textarea>
       </md-input-container>
       <md-input-container>
         <label>Image Author</label>
@@ -36,14 +48,32 @@
           <md-input v-model="footprintShare"></md-input>
         </md-input-container>
       </div>
+      <md-button @click="isMemeing=false">Cancel</md-button>
       <md-button type="submit" form="imageMetadata">OK</md-button>
     </form>
-    <ul v-else>
-      <li v-for="(value, key) in metadata">
-        <span>{{ key }} : {{ value }}</span>
-      </li>
-    </ul>
-    <router-link  v-for="k in footprints" :to="{ name: 'ViewImage', params: { uid: k }}"> {{ k }}</router-link>
+    </md-card-content>
+    </md-card>
+    <md-table-card v-else>
+      <md-table>
+        <md-table-body>
+          <md-table-row  v-for="(value, key) in metadata" :key="key">
+            <md-table-cell>{{ key }}</md-table-cell>
+            <md-table-cell>{{ value }}</md-table-cell>
+          </md-table-row>
+        </md-table-body>
+      </md-table>
+      <md-table v-if="footprints">
+        <md-table-body>
+          <md-table-row  v-for="(k, i) in footprints" :key="k">
+            <md-table-cell><router-link :to="{ name: 'ViewImage', params: { uid: k }}"> {{ k }}</router-link></md-table-cell>
+            <md-table-cell>{{ footprintShares[i] }}</md-table-cell>
+          </md-table-row>
+        </md-table-body>
+      </md-table>
+    </md-table-card>
+    <span><md-button class="md-primary md-raised" v-if="!isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
+    </md-layout>
+    </md-layout>
   </div>
 </template>
 
@@ -74,6 +104,9 @@ export default {
     },
     footprints() {
       return this.metadata.footprintIds;
+    },
+    footprintShares() {
+      return this.metadata.footprintShares;
     },
   },
   methods: {
