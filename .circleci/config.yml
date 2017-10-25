@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/like-poc-web
+    docker:
+      - image: node:8-alpine
+    steps:
+      - run: apk --no-cache add ca-certificates git gzip openssh-client tar
+      - checkout
+      - restore_cache:
+          key: like-poc-web-{{ checksum "package.json" }}-{{ checksum ".circleci/config.yml" }}
+      - run:
+          name: Dependencies
+          command:
+            yarn install
+      - run:
+          name: Lint
+          command:
+            yarn run lint
+      - save_cache:
+          key: like-poc-web-{{ checksum "package.json" }}-{{ checksum ".circleci/config.yml" }}
+          paths:
+            - "~/like-poc-web/node_modules"
