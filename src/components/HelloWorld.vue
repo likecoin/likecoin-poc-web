@@ -1,10 +1,14 @@
 <template>
   <div class="hello">
     <md-toolbar class="nav md-transparent">
-      <img src="../assets/like.png"
-           srcset="../assets/like@2x.png 2x,
-                   ../assets/like@3x.png 3x" />
-      <h1 class="title">{{ title }}</h1>
+      <router-link exact to="/">
+        <img class="logo"
+            src="../assets/like.png"
+            srcset="../assets/like@2x.png 2x,
+                    ../assets/like@3x.png 3x" />
+      </router-link>
+      <div class="title-box" ><h1 class="title">{{ title }}</h1>
+      <div class="colorbar1" /></div>
     </md-toolbar>
     <h2>Links</h2>
     <ul>
@@ -15,12 +19,13 @@
     </ul>
     <hr />
     <router-view/>
-    <div class="footer">
+    <div class="colorbar2" />
+    <footer>
       <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
         <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
       </a>
       This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    </div>
+    </footer>
   </div>
 </template>
 
@@ -64,6 +69,15 @@ li {
   margin: 0 10px;
 }
 
+.logo {
+  padding: 20px;
+}
+
+.title-box {
+  flex: 1;
+  height: 80px;
+}
+
 .title {
   background-image: linear-gradient(93deg, #55a8e5, #7850d9 50%, #730a70);
   background-clip: text;
@@ -75,6 +89,22 @@ li {
   font-weight: 300;
   height: 50px;
   margin: 0;
+}
+
+footer {
+  margin-top: 20px;
+}
+
+.colorbar1 {
+  width: 100%;
+  height: 2px;
+  background-image: linear-gradient(to right, #a8ff97, #69ecf1 30%, #77c9f5 51%, #b792ff 77%, #fe7ba0);
+}
+
+.colorbar2 {
+  width: 100%;
+  height: 2px;
+  background-image: linear-gradient(to left, #a8ff97, #69ecf1 30%, #77c9f5 51%, #b792ff 77%, #fe7ba0);
 }
 
 a {

@@ -43,7 +43,7 @@
         <span>{{ key }} : {{ value }}</span>
       </li>
     </ul>
-    <a v-for="k in footprints" @click="onFootprintClick(k)"> {{ k }}</a>
+    <router-link  v-for="k in footprints" :to="{ name: 'ViewImage', params: { uid: k }}"> {{ k }}</router-link>
   </div>
 </template>
 
@@ -99,9 +99,6 @@ export default {
         license,
         footprints: JSON.stringify(footprints),
       };
-    },
-    onFootprintClick(uid) {
-      this.$router.push({ name: 'ViewImage', params: { uid } });
     },
     onSubmit() {
       api.apiPostMeme(this.uid, this.memeText, this.getSerializedMetaData())
