@@ -38,7 +38,7 @@
         </md-input-container>
         <md-input-container>
           <label>Refernce Image share</label>
-          <md-input v-model="f.value"></md-input>
+          <md-input v-model="f.share"></md-input>
         </md-input-container>
       </div>
       <md-button v-if="footprints && footprints.length > 0"
@@ -94,7 +94,7 @@ export default {
       }
     },
     addFootprint() {
-      this.footprints.push({ id: '', value: 0.1 });
+      this.footprints.push({ id: '', share: 0.1 });
     },
     removeFootprint() {
       this.footprints.pop();

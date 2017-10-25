@@ -57,7 +57,7 @@ class EthHelper {
     const { id, author, wallet, description, license, footprints, ipfs } = format;
     const footprintsArray = JSON.parse(footprints);
     const footprintKeys = footprintsArray.map(f => f.id);
-    const footprintValues = footprintsArray.map(f => f.value);
+    const footprintValues = footprintsArray.map(f => f.share);
     this.likeContract.upload(
       id,
       author,
