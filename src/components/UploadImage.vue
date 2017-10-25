@@ -1,11 +1,20 @@
 <template>
   <div class="uploadimage">
-    <md-card>
-    <md-card-content>
+    <md-layout md-gutter>
+    <md-layout md-align="center"
+      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+      md-flex-large="40" md-flex-offset-large="5"
+      md-flex-xlarge="40" md-flex-offset-xlarge="5">
     <div class="image-preview">
         <img class="preview" :src="imageData">
     </div>
-    <form id="imageMetadata" v-on:submit.prevent="onSubmit">
+    </md-layout>
+    <md-layout md-column md-gutter
+      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+      md-flex="50">
+    <md-card>
+    <md-card-content>
+    <form id="imageMetadata" on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Image upload</label>
         <md-file v-model="image" @selected="previewImage" accept="image/*"></md-file>
@@ -45,10 +54,12 @@
         class="md-icon-button" @click.native="removeFootprint">
         <md-icon>remove</md-icon>
       </md-button>
-      <md-button type="submit" form="imageMetadata">OK</md-button>
+      <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
     </md-card-content>
     </md-card>
+    </md-layout>
+    </md-layout>
   </div>
 </template>
 
