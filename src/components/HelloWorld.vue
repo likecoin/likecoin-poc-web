@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <md-toolbar class="main-nav nav">
+    <md-toolbar id="main-nav" class="nav">
       <router-link exact to="/">
         <img class="logo"
             src="../assets/like.png"
@@ -69,7 +69,7 @@ li {
   margin: 0 10px;
 }
 
-.main-nav {
+#main-nav {
   background-color: white;
 }
 
