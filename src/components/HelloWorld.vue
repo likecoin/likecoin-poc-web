@@ -1,16 +1,23 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <router-view/>
-    <h2>Essential Links</h2>
+    <div v-if="test">
+    <hr />
+      <h2>Test buttons</h2>
+      <button @click='onClick'>click</button>
+      <button @click='onClickGet'>get</button>
+    </div>
+    <hr />
+    <h2>Links</h2>
     <ul>
       <li><router-link :to="{ name: 'UploadImage' }">
         Upload Image
       </router-link></li>
+      <br />
+      <li @click="test=!test">Test buttons</li>
     </ul>
-    <h2>Test buttons</h2>
-    <button @click='onClick'>click</button>
-    <button @click='onClickGet'>get</button>
+    <hr />
+    <router-view/>
   </div>
 </template>
 
@@ -21,7 +28,8 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App',
+      msg: 'LikeCoin Media chain POC',
+      test: false,
     };
   },
   methods: {
