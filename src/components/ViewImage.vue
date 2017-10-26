@@ -1,5 +1,6 @@
 <template>
   <div class="view">
+    <md-progress v-if="loading" md-indeterminate></md-progress>
     <md-layout md-gutter>
     <md-layout md-align="center"
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
@@ -97,6 +98,7 @@ export default {
       footprintShare: 50,
       isMemeing: false,
       memeText: 'Hi!',
+      loading: false,
     };
   },
   computed: {
@@ -135,8 +137,10 @@ export default {
       };
     },
     onSubmit() {
+      this.loading = true;
       api.apiPostMeme(this.uid, this.memeText, this.getSerializedMetaData())
       .then((result) => {
+        this.loading = false;
         EthHelper.onClick(result.data, (err) => {
           if (err) return;
           this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });

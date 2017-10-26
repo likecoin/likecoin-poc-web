@@ -1,5 +1,6 @@
 <template>
   <div class="uploadimage">
+    <md-progress v-if="loading" md-indeterminate></md-progress>
     <md-layout md-gutter>
     <md-layout md-align="center"
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
@@ -81,6 +82,7 @@ export default {
       license: '',
       footprints: [],
       wallet: EthHelper.getWallet(),
+      loading: false,
     };
   },
   methods: {
@@ -111,8 +113,10 @@ export default {
       this.footprints.pop();
     },
     onSubmit() {
+      this.loading = true;
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {
+        this.loading = false;
         EthHelper.onClick(result.data, (err) => {
           if (err) return;
           this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
