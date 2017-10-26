@@ -41,11 +41,11 @@
       <h2>Image parents</h2>
       <div>
         <md-input-container>
-          <label>Parent Image ID</label>
+          <label>Parent content Fingerprint</label>
           <md-input disabled v-model="footprintId"></md-input>
         </md-input-container>
         <md-input-container>
-          <label>Parent Image share</label>
+          <label>Parent contribution %</label>
           <md-input v-model="footprintShare"></md-input>
         </md-input-container>
       </div>

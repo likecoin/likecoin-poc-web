@@ -42,11 +42,11 @@
       </md-button></h2>
       <div v-for="f in footprints">
         <md-input-container>
-          <label>Parent Image ID</label>
+          <label>Parent content Fingerprint</label>
           <md-input v-model="f.id"></md-input>
         </md-input-container>
         <md-input-container>
-          <label>Parent Image share</label>
+          <label>Parent contribution %</label>
           <md-input v-model="f.share"></md-input>
         </md-input-container>
       </div>
