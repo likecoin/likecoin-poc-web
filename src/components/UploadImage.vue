@@ -20,33 +20,33 @@
         <md-file v-model="image" @selected="previewImage" accept="image/*"></md-file>
       </md-input-container>
       <md-input-container>
-        <label>Image Author</label>
+        <label>Author</label>
         <md-input v-model="author"></md-input>
       </md-input-container>
       <md-input-container>
-        <label>Image's ETH Wallet address</label>
+        <label>Author ETH wallet address</label>
         <md-input v-model="wallet"></md-input>
       </md-input-container>
       <md-input-container>
-        <label>Image Description</label>
+        <label>Description</label>
         <md-textarea v-model="description"></md-textarea>
       </md-input-container>
       <md-input-container>
-        <label>Image License</label>
+        <label>License</label>
         <md-input v-model="license"></md-input>
       </md-input-container>
       <hr />
-      <h2>Image references
+      <h2>Image parents</h2>
       <md-button class="md-icon-button" @click.native="addFootprint">
         <md-icon>playlist_add</md-icon>
       </md-button></h2>
       <div v-for="f in footprints">
         <md-input-container>
-          <label>Refernce Image UID</label>
+          <label>Parent Image ID</label>
           <md-input v-model="f.id"></md-input>
         </md-input-container>
         <md-input-container>
-          <label>Refernce Image share</label>
+          <label>Parent Image share</label>
           <md-input v-model="f.share"></md-input>
         </md-input-container>
       </div>

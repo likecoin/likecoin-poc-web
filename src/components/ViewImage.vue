@@ -21,30 +21,30 @@
         <md-textarea v-model="memeText"></md-textarea>
       </md-input-container>
       <md-input-container>
-        <label>Image Author</label>
+        <label>Author</label>
         <md-input v-model="author"></md-input>
       </md-input-container>
       <md-input-container>
-        <label>Image's ETH Wallet address</label>
+        <label>Author ETH wallet address</label>
         <md-input v-model="wallet"></md-input>
       </md-input-container>
       <md-input-container>
-        <label>Image Description</label>
+        <label>Description</label>
         <md-textarea v-model="description"></md-textarea>
       </md-input-container>
       <md-input-container>
-        <label>Image License</label>
+        <label>License</label>
         <md-input v-model="license"></md-input>
       </md-input-container>
       <hr />
-      <h2>Image references</h2>
+      <h2>Image parents</h2>
       <div>
         <md-input-container>
-          <label>Refernce Image UID</label>
+          <label>Parent Image ID</label>
           <md-input disabled v-model="footprintId"></md-input>
         </md-input-container>
         <md-input-container>
-          <label>Refernce Image share</label>
+          <label>Parent Image share</label>
           <md-input v-model="footprintShare"></md-input>
         </md-input-container>
       </div>
