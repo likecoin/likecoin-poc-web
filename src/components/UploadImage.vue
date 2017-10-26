@@ -6,7 +6,7 @@
       md-flex-large="40" md-flex-offset-large="5"
       md-flex-xlarge="40" md-flex-offset-xlarge="5">
     <div class="image-preview">
-        <img class="preview" :src="imageData">
+      <md-image :md-src="imageData" />
     </div>
     </md-layout>
     <md-layout md-column md-gutter

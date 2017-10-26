@@ -6,7 +6,8 @@
       md-flex-large="40" md-flex-offset-large="5"
       md-flex-xlarge="40" md-flex-offset-xlarge="5">
     <div class="image-view">
-      <img :src="imgUrl" />
+      <md-spinner v-if="!ipfsHash" md-indeterminate />
+      <md-image  v-else :md-src="imgUrl" />
     </div>
     <div v-if="isMemeing"></div>
     </md-layout>
