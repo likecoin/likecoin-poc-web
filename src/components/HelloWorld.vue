@@ -7,17 +7,13 @@
             srcset="../assets/like@2x.png 2x,
                     ../assets/like@3x.png 3x" />
       </router-link>
-      <div class="title-box" ><h1 class="title">{{ title }}</h1>
-      <div class="colorbar1" /></div>
+      <md-layout class="title-box"><h1 class="title">{{ title }}</h1>
+        <div class="colorbar1" />
+        <md-layout md-row><div style="flex:1"></div>
+          <router-link :to="{ name: 'UploadImage' }" tag="md-button" class="upload-button md-raised"><md-icon>add</md-icon>Upload</router-link>
+        </md-layout>
+      </md-layout>
     </md-toolbar>
-    <h2>Links</h2>
-    <ul>
-      <li><router-link :to="{ name: 'UploadImage' }">
-        Upload Image
-      </router-link></li>
-      <br />
-    </ul>
-    <hr />
     <router-view/>
     <div class="colorbar2" />
     <footer>
@@ -93,6 +89,10 @@ li {
   font-weight: 300;
   height: 50px;
   margin: 0;
+}
+
+.upload-button{
+  margin: 15px;
 }
 
 footer {
