@@ -52,7 +52,7 @@ class EthHelper {
     if (cb) cb();
   }
 
-  onClick(format, cb) {
+  onClick(format, pre, cb) {
     if (!this.likeContract) return;
     const { id, author, wallet, description, license, footprints, ipfs } = format;
     const footprintsArray = JSON.parse(footprints);
@@ -70,6 +70,7 @@ class EthHelper {
       { from: this.accounts[0], gas: 900000, data: '0x' },
     )
     .then((txHash) => {
+      if (pre) pre();
       console.log('Transaction sent');
       console.dir(txHash);
       this.waitForTxToBeMined(txHash, cb);

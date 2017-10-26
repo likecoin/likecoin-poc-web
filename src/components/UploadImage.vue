@@ -117,10 +117,17 @@ export default {
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {
         this.loading = false;
-        EthHelper.onClick(result.data, (err) => {
-          if (err) return;
-          this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
-        });
+        EthHelper.onClick(
+          result.data,
+          () => {
+            this.loading = true;
+          },
+          (err) => {
+            this.loading = false;
+            if (err) return;
+            this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
+          },
+        );
       });
     },
   },
