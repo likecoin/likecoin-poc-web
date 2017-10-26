@@ -14,7 +14,7 @@
       md-flex="50">
     <md-card>
     <md-card-content>
-    <form id="imageMetadata" on:submit.prevent="onSubmit">
+    <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Image upload</label>
         <md-file v-model="image" @selected="previewImage" accept="image/*"></md-file>
