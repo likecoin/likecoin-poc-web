@@ -14,7 +14,7 @@
         </md-layout>
       </md-layout>
     </md-toolbar>
-    <router-view/>
+    <div class="inner-container"><router-view/></div>
     <div class="colorbar2" />
     <footer>
       <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
@@ -91,8 +91,12 @@ li {
   margin: 0;
 }
 
-.upload-button{
+.upload-button {
   margin: 15px;
+}
+
+.inner-container {
+  margin: 20px;
 }
 
 footer {
