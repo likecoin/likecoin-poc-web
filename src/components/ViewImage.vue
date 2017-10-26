@@ -57,18 +57,32 @@
     </md-card>
     <md-table-card v-else>
       <md-table>
+        <md-table-header>
+          <md-table-row>
+            <md-table-head>Metadata</md-table-head>
+            <md-table-head></md-table-head>
+          </md-table-row>
+        </md-table-header>
         <md-table-body>
-          <md-table-row  v-for="(value, key) in metadata" :key="key">
-            <md-table-cell>{{ key }}</md-table-cell>
-            <md-table-cell>{{ value }}</md-table-cell>
+          <md-table-row  v-for="(value, key) in metadata" :key="key" v-if="!key.includes('footprint')">
+            <md-table-cell>{{ key==='key'? 'Fingerprint': key }}</md-table-cell>
+            <md-table-cell v-if="key==='timestamp'">{{ parseTimeStamp(value) }}</md-table-cell>
+            <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>
         </md-table-body>
       </md-table>
+      <hr />
       <md-table v-if="footprints">
+        <md-table-header>
+          <md-table-row>
+            <md-table-head>Parent content Fingerprint</md-table-head>
+            <md-table-head>Parent contribution %</md-table-head>
+          </md-table-row>
+        </md-table-header>
         <md-table-body>
           <md-table-row  v-for="(k, i) in footprints" :key="k">
             <md-table-cell><router-link :to="{ name: 'ViewImage', params: { uid: k }}"> {{ k }}</router-link></md-table-cell>
-            <md-table-cell>{{ footprintShares[i] }}</md-table-cell>
+            <md-table-cell>{{ parseInt(footprintShares[i], 16) }}</md-table-cell>
           </md-table-row>
         </md-table-body>
       </md-table>
@@ -80,6 +94,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 import * as api from '@/api/api';
 import EthHelper from '@/util/EthHelper';
 
@@ -124,6 +140,10 @@ export default {
           this.footprintId = uid;
         });
       }
+    },
+    parseTimeStamp(hex) {
+      const t = new Date(parseInt(hex, 16) * 1000);
+      return moment(t).format('YYYY-MM-DD HH:mm:ss');
     },
     getSerializedMetaData() {
       const { author, wallet, description, license, footprintId, footprintShare } = this;
