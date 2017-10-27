@@ -30,10 +30,9 @@ export default {
       ])
       .then((res) => {
         this.ipfsHost = res.request.responseURL.replace(hash, '');
-        console.log(`WINNER: ${this.ipfsHost}`);
       })
       .catch((err) => {
-        console.log(err);
+        console.log(`Err: ${err}`);
       });
     },
   },

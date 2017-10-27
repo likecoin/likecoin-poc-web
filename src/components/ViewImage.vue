@@ -73,7 +73,7 @@
         </md-table-body>
       </md-table>
       <hr />
-      <md-table v-if="footprints">
+      <md-table v-if="footprints && footprints.length > 0">
         <md-table-header>
           <md-table-row>
             <md-table-head>Parent content Fingerprint</md-table-head>

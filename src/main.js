@@ -22,7 +22,6 @@ new Vue({
   watch: {
     '$intercom.ready': function ready() {
       this.$intercom.boot({ });
-      this.$intercom.show();
     },
   },
 });

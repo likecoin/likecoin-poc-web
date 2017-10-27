@@ -32,7 +32,7 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      title: 'Meme Generator - with content footprint',
+      title: 'Meme Generator - showcasing Content Footprint',
     };
   },
   methods: {
