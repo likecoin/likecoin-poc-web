@@ -48,6 +48,7 @@ export default {
           return { id: r.topics[1], ipfs: decode.ipfs };
         });
         this.vList = decodeList.slice(decodeList.length - 10, decodeList.length);
+        this.vList.reverse();
       })
       .catch((response) => {
         // error callback
