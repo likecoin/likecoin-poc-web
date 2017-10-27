@@ -29,7 +29,9 @@ export default {
         .then(() => axios.head(`${IPFS_HOST}/${hash}`)),
       ])
       .then((res) => {
-        this.ipfsHost = res.request.responseURL.replace(hash, '');
+        if (res.status < 300) {
+          this.ipfsHost = res.request.responseURL.replace(`/${hash}`, '');
+        }
       })
       .catch((err) => {
         console.log(`Err: ${err}`);
