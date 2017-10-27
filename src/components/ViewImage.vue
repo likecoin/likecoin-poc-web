@@ -20,9 +20,13 @@
     <md-card v-if="isMemeing">
     <md-card-content>
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
-      <md-input-container class="md-input-invalid">
+      <md-input-container md-flex="50" class="md-input-invalid">
+        <label>Top Meme Text</label>
+        <md-textarea placeholder=">PUT MEME HERE" v-model="topMemeText"></md-textarea>
+      </md-input-container>
+      <md-input-container md-flex="50" class="md-input-invalid">
         <label>Bottom Meme Text</label>
-        <md-textarea required placeholder=">PUT MEME HERE" v-model="memeText"></md-textarea>
+        <md-textarea placeholder=">PUT MEME HERE" v-model="memeText"></md-textarea>
       </md-input-container>
       <md-input-container>
         <label>Author</label>
@@ -120,6 +124,7 @@ export default {
       footprintShare: 50,
       isMemeing: false,
       memeText: '',
+      topMemeText: '',
       loading: false,
     };
   },
@@ -167,7 +172,7 @@ export default {
     },
     onSubmit() {
       this.loading = true;
-      api.apiPostMeme(this.uid, this.memeText, this.getSerializedMetaData())
+      api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
       .then((result) => {
         this.loading = false;
         EthHelper.onClick(
