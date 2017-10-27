@@ -1,9 +1,10 @@
 <template>
   <div class="view">
     <md-layout md-gutter>
-      <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex-large="25" class="image-view" v-for="(ipfs, id) in vList" :key="id">
+      <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
+       class="image-view" v-for="(ipfs, id) in vList" :key="id">
         <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
-          <md-image :md-src="imgUrl(ipfs.ipfs)" />
+          <md-ipfs-image :ipfsSrc="ipfs.ipfs" />
         </router-link>
       </md-layout>
     </md-layout>
@@ -13,6 +14,7 @@
 <script>
 import * as api from '@/api/api';
 import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS, RINKEBY_ID } from '@/constant/contract/likemedia';
+import MdIpfsImage from './MdIpfsImage';
 
 const abi = require('web3-eth-abi');
 
@@ -22,6 +24,9 @@ export default {
     return {
       vList: [],
     };
+  },
+  components: {
+    'md-ipfs-image': MdIpfsImage,
   },
   methods: {
     refreshList(eventObj, signature) {
@@ -48,9 +53,6 @@ export default {
         // error callback
         console.log(response);
       });
-    },
-    imgUrl(ipfs) {
-      return `https://ipfs.io/ipfs/${ipfs}`;
     },
   },
   mounted() {
