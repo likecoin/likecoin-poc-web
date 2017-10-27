@@ -10,6 +10,7 @@
       <md-spinner v-if="!ipfsHash" md-indeterminate />
       <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
     </div>
+    <md-progress v-if="loading" md-indeterminate></md-progress>
     <div v-if="isMemeing"></div>
     </md-layout>
     <md-layout md-column md-gutter
@@ -19,9 +20,9 @@
     <md-card v-if="isMemeing">
     <md-card-content>
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
-      <md-input-container>
-        <label>Meme</label>
-        <md-textarea v-model="memeText"></md-textarea>
+      <md-input-container class="md-input-invalid">
+        <label>Bottom Meme Text</label>
+        <md-textarea required placeholder=">PUT MEME HERE" v-model="memeText"></md-textarea>
       </md-input-container>
       <md-input-container>
         <label>Author</label>
@@ -91,6 +92,9 @@
     <span><md-button class="md-primary md-raised" v-if="!isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
     </md-layout>
     </md-layout>
+    <md-snackbar ref="snackbar">
+      <span>Transaction pending. It usually takes less than a minute to process.</span>
+    </md-snackbar>
   </div>
 </template>
 
@@ -115,7 +119,7 @@ export default {
       footprintId: '',
       footprintShare: 50,
       isMemeing: false,
-      memeText: 'Hi!',
+      memeText: '',
       loading: false,
     };
   },
@@ -169,6 +173,7 @@ export default {
         EthHelper.onClick(
           result.data,
           () => {
+            this.$refs.snackbar.open();
             this.loading = true;
           },
           (err) => {

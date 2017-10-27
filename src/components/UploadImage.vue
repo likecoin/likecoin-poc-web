@@ -9,6 +9,7 @@
     <div class="image-preview">
       <md-image :md-src="imageData" />
     </div>
+    <md-progress v-if="loading" md-indeterminate></md-progress>
     </md-layout>
     <md-layout md-column md-gutter
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
@@ -61,6 +62,9 @@
     </md-card>
     </md-layout>
     </md-layout>
+    <md-snackbar ref="snackbar">
+      <span>Transaction pending. It usually takes less than a minute to process.</span>
+    </md-snackbar>
   </div>
 </template>
 
@@ -120,6 +124,7 @@ export default {
         EthHelper.onClick(
           result.data,
           () => {
+            this.$refs.snackbar.open();
             this.loading = true;
           },
           (err) => {
