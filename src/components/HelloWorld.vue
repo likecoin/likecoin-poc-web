@@ -14,6 +14,7 @@
         </md-layout>
       </md-layout>
     </md-toolbar>
+    <md-toolbar v-if="errMsg" class="md-warn"><md-spinner md-indeterminate /><md-icon>warning</md-icon><md-layout v-html="errMsg" /></md-toolbar>
     <div class="inner-container"><router-view/></div>
     <div class="colorbar2" />
     <footer>
@@ -33,6 +34,11 @@ export default {
   data() {
     return {
       title: 'Meme Generator - showcasing Content Footprint',
+      errMsg: '',
+      web3Error: 'Cannot connect to ETH Wallet, is  <a href="https://metamask.io/">Metamask</a>  installed?',
+      testnetError: 'You are in wrong ETH network, please switch to testnet '
+      + ' <a href="https://www.rinkeby.io/"> Rinkeby </a> in metamask.',
+      lockedError: 'Cannot obtain your ETH wallet, please make sure it is UNLOCKED.',
     };
   },
   methods: {
@@ -44,7 +50,16 @@ export default {
     },
   },
   mounted() {
-    EthHelper.initApp();
+    EthHelper.initApp(
+      (err) => {
+        if (err === 'web3') this.errMsg = this.web3Error;
+        else if (err === 'testnet') this.errMsg = this.testnetError;
+        else if (err === 'locked') this.errMsg = this.lockedError;
+      },
+      () => {
+        this.errMsg = '';
+      },
+    );
   },
 };
 </script>

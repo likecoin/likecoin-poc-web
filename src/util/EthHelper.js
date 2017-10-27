@@ -6,34 +6,55 @@ const EthContract = require('ethjs-contract');
 
 class EthHelper {
 
-  initApp() {
+  initApp(errCb, clearErrCb) {
+    this.errCb = errCb;
+    this.clearErrCb = clearErrCb;
+    this.pollForWeb3();
+  }
+
+  pollForWeb3() {
     if (typeof web3 !== 'undefined') {
       if (this.retryTimer) {
         clearTimeout(this.retryTimer);
         this.retryTimer = null;
       }
-      const eth = new Eth(web3.currentProvider);
-      this.startApp(eth);
+      web3.version.getNetwork((err, netId) => {
+        if (netId === '4') {
+          const eth = new Eth(web3.currentProvider);
+          this.clearErrCb();
+          this.startApp(eth);
+        } else {
+          this.errCb('testnet');
+          this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
+        }
+      });
     } else {
       /* if use testrpc instead */
       // const eth = new Eth(new Eth.HttpProvider('http://localhost:8545'));
       // this.startApp(eth);
-      this.retryTimer = setTimeout(this.initApp, 3000);
+      this.errCb('web3');
+      this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
     }
   }
 
   startApp(eth) {
     this.eth = eth;
     const contract = new EthContract(eth);
+    const LikeContract = contract(LIKE_MEDIA_ABI);
+    this.likeContract = LikeContract.at(LIKE_MEDIA_ADDRESS);
+    this.getAccounts(eth);
+  }
+
+  getAccounts(eth) {
     eth.accounts().then((accounts) => {
-      this.accounts = accounts;
-      this.wallet = accounts[0];
-      const LikeContract = contract(LIKE_MEDIA_ABI);
-      this.likeContract = LikeContract.at(LIKE_MEDIA_ADDRESS, {
-        from: accounts[0],
-        gas: 300000,
-      });
-      console.log(this.eth);
+      if (accounts && accounts[0]) {
+        this.accounts = accounts;
+        this.wallet = accounts[0];
+        this.clearErrCb();
+      } else {
+        this.errCb('locked');
+        this.retryTimer = setTimeout(() => this.getAccounts(eth), 3000);
+      }
     });
   }
 
