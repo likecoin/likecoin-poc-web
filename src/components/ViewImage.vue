@@ -4,7 +4,7 @@
     <md-layout md-gutter>
     <md-layout md-align="center"
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
-      md-flex-large="40" md-flex-offset-large="5"
+      md-flex-large="40"
       md-flex-xlarge="40" md-flex-offset-xlarge="5">
     <div class="image-view">
       <md-spinner v-if="!ipfsHash" md-indeterminate />
@@ -14,6 +14,7 @@
     </md-layout>
     <md-layout md-column md-gutter
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+      md-flex-large = "60"
       md-flex="50">
     <md-card v-if="isMemeing">
     <md-card-content>
