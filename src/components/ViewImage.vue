@@ -8,7 +8,7 @@
       md-flex-xlarge="40" md-flex-offset-xlarge="5">
     <div class="image-view">
       <md-spinner v-if="!ipfsHash" md-indeterminate />
-      <md-image  v-else :md-src="imgUrl" />
+      <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
     </div>
     <div v-if="isMemeing"></div>
     </md-layout>
@@ -99,6 +99,7 @@ import moment from 'moment';
 
 import * as api from '@/api/api';
 import EthHelper from '@/util/EthHelper';
+import MdIpfsImage from './MdIpfsImage';
 
 export default {
   name: 'ViewImage',
@@ -118,9 +119,12 @@ export default {
       loading: false,
     };
   },
+  components: {
+    'md-ipfs-image': MdIpfsImage,
+  },
   computed: {
     imgUrl() {
-      return `https://ipfs.io/ipfs/${this.ipfsHash}`;
+      return `${this.ipfsHash}`;
     },
     footprints() {
       return this.metadata.footprintIds;
