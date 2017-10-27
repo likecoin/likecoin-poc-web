@@ -171,6 +171,7 @@ export default {
             this.loading = false;
             if (err) return;
             this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
+            location.reload(); // refresh for better UX and less state problem
           },
         );
       });
