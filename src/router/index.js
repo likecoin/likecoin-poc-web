@@ -29,7 +29,6 @@ export default new Router({
           path: '/',
           name: 'ViewList',
           component: ViewList,
-          props: true,
         },
       ],
     },

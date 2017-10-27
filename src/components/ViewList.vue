@@ -1,7 +1,7 @@
 <template>
   <div class="view">
     <md-layout md-gutter>
-      <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex-large="25" class="image-view" v-for="(ipfs, id) in vList" :key="id" :md-item="ipfs">
+      <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex-large="25" class="image-view" v-for="(ipfs, id) in vList" :key="id">
         <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
           <md-image :md-src="imgUrl(ipfs.ipfs)" />
         </router-link>
@@ -16,14 +16,6 @@ import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS, RINKEBY_ID } from '@/constant/contr
 
 const abi = require('web3-eth-abi');
 
-let eventObj = {};
-LIKE_MEDIA_ABI.forEach((obj) => {
-  if (obj.type === 'event' && obj.name === 'Uploaded') {
-    eventObj = obj;
-  }
-});
-const signature = abi.encodeEventSignature(eventObj);
-
 export default {
   name: 'ViewList',
   data() {
@@ -32,7 +24,7 @@ export default {
     };
   },
   methods: {
-    refreshList() {
+    refreshList(eventObj, signature) {
       const data = {
         jsonrpc: '2.0',
         method: 'eth_getLogs',
@@ -62,7 +54,9 @@ export default {
     },
   },
   mounted() {
-    this.refreshList();
+    const eventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' && obj.name === 'Uploaded'));
+    const signature = abi.encodeEventSignature(eventObj);
+    this.refreshList(eventObj, signature);
   },
 };
 </script>
