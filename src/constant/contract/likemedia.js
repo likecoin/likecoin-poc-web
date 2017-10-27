@@ -188,3 +188,5 @@ export const LIKE_MEDIA_ABI = [
 ];
 
 export const LIKE_MEDIA_ADDRESS = '0xA97fEfe489ca62ADD4949360DCE30e3351F6881B';
+
+export const RINKEBY_ID = 'ywCD9mvUruQeYcZcyghk';

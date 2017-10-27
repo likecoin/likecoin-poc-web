@@ -5,14 +5,14 @@ jobs:
     docker:
       - image: node:8-alpine
     steps:
-      - run: apk --no-cache add ca-certificates git gzip openssh-client tar
+      - run: apk --no-cache add ca-certificates git gzip openssh-client tar python make g++
       - checkout
       - restore_cache:
           key: like-poc-web-{{ checksum "package.json" }}-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Dependencies
           command:
-            yarn install
+            npm install
       - run:
           name: Lint
           command:

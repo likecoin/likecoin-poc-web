@@ -15,3 +15,6 @@ export const apiPostMeme = (uid, text, metadata) =>
   axios.post(`${HOST}/meme/${uid}`, { text, metadata });
 
 export const apiGetMetadata = uid => axios.get(`${HOST}/query/${uid}`);
+
+export const apiPostRinkeby = (id, data) =>
+  axios.post(`https://rinkeby.infura.io/${id}`, data);
