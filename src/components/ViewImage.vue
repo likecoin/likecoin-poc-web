@@ -174,13 +174,8 @@ export default {
       this.loading = true;
       api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
       .then((result) => {
-        this.loading = false;
-        EthHelper.onClick(
-          result.data,
-          () => {
-            this.$refs.snackbar.open();
-            this.loading = true;
-          },
+        EthHelper.waitForTxToBeMined(
+          result.data.txHash,
           (err) => {
             this.loading = false;
             if (err) return;
