@@ -172,6 +172,7 @@ export default {
     },
     onSubmit() {
       this.loading = true;
+      this.$refs.snackbar.open();
       api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
       .then((result) => {
         EthHelper.waitForTxToBeMined(
