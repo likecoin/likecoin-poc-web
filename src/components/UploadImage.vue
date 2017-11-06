@@ -118,15 +118,11 @@ export default {
     },
     onSubmit() {
       this.loading = true;
+      this.$refs.snackbar.open();
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {
-        this.loading = false;
-        EthHelper.onClick(
-          result.data,
-          () => {
-            this.$refs.snackbar.open();
-            this.loading = true;
-          },
+        EthHelper.waitForTxToBeMined(
+          result.data.txHash,
           (err) => {
             this.loading = false;
             if (err) return;

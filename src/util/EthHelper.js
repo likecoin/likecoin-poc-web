@@ -9,7 +9,7 @@ class EthHelper {
   initApp(errCb, clearErrCb) {
     this.errCb = errCb;
     this.clearErrCb = clearErrCb;
-    this.pollForWeb3();
+    setTimeout(() => this.pollForWeb3(), 3000);
   }
 
   pollForWeb3() {
@@ -32,8 +32,11 @@ class EthHelper {
       /* if use testrpc instead */
       // const eth = new Eth(new Eth.HttpProvider('http://localhost:8545'));
       // this.startApp(eth);
-      this.errCb('web3');
-      this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
+      /* if no metamask, connect to rinkeby directly */
+      const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'));
+      this.startApp(eth);
+      // this.errCb('web3');
+      // this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
     }
   }
 
