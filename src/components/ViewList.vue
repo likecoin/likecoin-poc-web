@@ -23,10 +23,21 @@ export default {
   data() {
     return {
       vList: [],
+      completeList: [],
     };
   },
   components: {
     'md-ipfs-image': MdIpfsImage,
+  },
+  computed: {
+    memeList() {
+      const list = this.completeList.filter(v => v.isOriginal);
+      return list.slice(list.length - 10, list.length).reverse();
+    },
+    originalList() {
+      const list = this.completeList.filter(v => !v.isOriginal);
+      return list.slice(list.length - 10, list.length).reverse();
+    },
   },
   methods: {
     refreshList(eventObj, signature) {
@@ -45,10 +56,14 @@ export default {
         // get body data
         const decodeList = response.data.result.map((r) => {
           const decode = abi.decodeLog(eventObj.inputs, r.data, r.topics);
-          return { id: r.topics[1], ipfs: decode.ipfs };
+          return {
+            id: r.topics[1],
+            ipfs: decode.ipfs,
+            isOriginal: (decode.footprintKeys && decode.footprintKeys.length > 0),
+          };
         });
-        this.vList = decodeList.slice(decodeList.length - 10, decodeList.length);
-        this.vList.reverse();
+        this.completeList = decodeList.slice(decodeList.length - 100, decodeList.length);
+        this.vList = decodeList.slice(decodeList.length - 10, decodeList.length).reverse();
       })
       .catch((response) => {
         // error callback
