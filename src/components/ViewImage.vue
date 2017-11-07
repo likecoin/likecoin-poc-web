@@ -2,24 +2,22 @@
   <div class="view">
     <md-progress v-if="loading" md-indeterminate></md-progress>
     <md-layout md-gutter>
-    <md-layout md-align="center"
-      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+    <md-layout md-align="center" md-column
+      md-flex-xsmall="100" md-flex-small="100"
+      md-flex-medium="80" md-flex-offset-medium="10"
       md-flex-large="40"
-      md-flex-xlarge="40" md-flex-offset-xlarge="5">
-    <div class="image-view">
-      <md-spinner v-if="!ipfsHash" md-indeterminate />
-      <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
-    </div>
+      md-flex-xlarge="50">
+      <div class="image-view">
+        <md-spinner v-if="!ipfsHash" md-indeterminate />
+        <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
+      </div>
     <md-progress v-if="loading" md-indeterminate></md-progress>
-    <div v-if="isMemeing"></div>
     </md-layout>
     <md-layout md-column md-gutter
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
       md-flex-large = "60"
       md-flex="50">
-    <md-card v-if="isMemeing">
-    <md-card-content>
-    <form id="imageMetadata" v-on:submit.prevent="onSubmit">
+    <form v-if="isMemeing" id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container md-flex="50" class="md-input-invalid">
         <label>Top Meme Text</label>
         <md-textarea placeholder=">PUT MEME HERE" v-model="topMemeText"></md-textarea>
@@ -57,11 +55,9 @@
         </md-input-container>
       </div>
       <md-button @click="isMemeing=false">Cancel</md-button>
-      <md-button type="submit" form="imageMetadata">OK</md-button>
+      <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
-    </md-card-content>
-    </md-card>
-    <md-table-card v-else>
+    <div class="metadatas" v-else>
       <md-table>
         <md-table-header>
           <md-table-row>
@@ -92,7 +88,7 @@
           </md-table-row>
         </md-table-body>
       </md-table>
-    </md-table-card>
+    </div>
     <span><md-button class="md-primary md-raised" v-if="!isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
     </md-layout>
     </md-layout>
@@ -223,4 +219,13 @@ li {
 a {
   color: #42b983;
 }
+
+form {
+  margin: 20px;
+}
+
+.metadatas {
+  margin: 20px;
+}
+
 </style>
