@@ -1,6 +1,14 @@
 <template>
   <div class="view">
     <md-layout md-gutter>
+      <md-tabs md-right class="md-transparent" @change="onTabChange">
+        <md-tab md-label="Latest">
+        </md-tab>
+        <md-tab md-label="Original">
+        </md-tab>
+        <md-tab md-label="Meme!">
+        </md-tab>
+      </md-tabs>
       <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
        class="image-view" v-for="(ipfs, id) in vList" :key="id">
         <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
@@ -30,12 +38,16 @@ export default {
     'md-ipfs-image': MdIpfsImage,
   },
   computed: {
-    memeList() {
-      const list = this.completeList.filter(v => v.isOriginal);
-      return list.slice(list.length - 10, list.length).reverse();
+    newList() {
+      const decodeList = this.completeList;
+      return decodeList.slice(decodeList.length - 10, decodeList.length).reverse();
     },
     originalList() {
       const list = this.completeList.filter(v => !v.isOriginal);
+      return list.slice(list.length - 10, list.length).reverse();
+    },
+    memeList() {
+      const list = this.completeList.filter(v => v.isOriginal);
       return list.slice(list.length - 10, list.length).reverse();
     },
   },
@@ -63,12 +75,17 @@ export default {
           };
         });
         this.completeList = decodeList.slice(decodeList.length - 100, decodeList.length);
-        this.vList = decodeList.slice(decodeList.length - 10, decodeList.length).reverse();
+        this.vList = this.newList;
       })
       .catch((response) => {
         // error callback
         console.log(response);
       });
+    },
+    onTabChange(index) {
+      if (index === 0) this.vList = this.newList;
+      else if (index === 1) this.vList = this.originalList;
+      else if (index === 2) this.vList = this.memeList;
     },
   },
   mounted() {
