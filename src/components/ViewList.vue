@@ -1,6 +1,14 @@
 <template>
   <div class="view">
     <md-layout md-gutter>
+      <md-tabs md-right class="md-transparent" @change="onTabChange">
+        <md-tab md-label="Latest">
+        </md-tab>
+        <md-tab md-label="Original">
+        </md-tab>
+        <md-tab md-label="Meme!">
+        </md-tab>
+      </md-tabs>
       <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
        class="image-view" v-for="(ipfs, id) in vList" :key="id">
         <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
@@ -23,10 +31,25 @@ export default {
   data() {
     return {
       vList: [],
+      completeList: [],
     };
   },
   components: {
     'md-ipfs-image': MdIpfsImage,
+  },
+  computed: {
+    newList() {
+      const decodeList = this.completeList;
+      return decodeList.slice(decodeList.length - 10, decodeList.length).reverse();
+    },
+    originalList() {
+      const list = this.completeList.filter(v => !v.isOriginal);
+      return list.slice(list.length - 10, list.length).reverse();
+    },
+    memeList() {
+      const list = this.completeList.filter(v => v.isOriginal);
+      return list.slice(list.length - 10, list.length).reverse();
+    },
   },
   methods: {
     refreshList(eventObj, signature) {
@@ -45,15 +68,24 @@ export default {
         // get body data
         const decodeList = response.data.result.map((r) => {
           const decode = abi.decodeLog(eventObj.inputs, r.data, r.topics);
-          return { id: r.topics[1], ipfs: decode.ipfs };
+          return {
+            id: r.topics[1],
+            ipfs: decode.ipfs,
+            isOriginal: (decode.footprintKeys && decode.footprintKeys.length > 0),
+          };
         });
-        this.vList = decodeList.slice(decodeList.length - 10, decodeList.length);
-        this.vList.reverse();
+        this.completeList = decodeList.slice(decodeList.length - 100, decodeList.length);
+        this.vList = this.newList;
       })
       .catch((response) => {
         // error callback
         console.log(response);
       });
+    },
+    onTabChange(index) {
+      if (index === 0) this.vList = this.newList;
+      else if (index === 1) this.vList = this.originalList;
+      else if (index === 2) this.vList = this.memeList;
     },
   },
   mounted() {
