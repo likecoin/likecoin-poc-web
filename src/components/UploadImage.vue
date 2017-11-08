@@ -58,7 +58,7 @@
     </form>
     </md-layout>
     </md-layout>
-    <md-snackbar md-duration="30000" ref="snackbar">
+    <md-snackbar md-duration="Infinity" ref="snackbar">
       <span>Transaction pending. It usually takes less than a minute to process.</span>
       <a v-if="txHash" :href="'https://rinkeby.etherscan.io/tx/'+txHash" target="_blank"> View on etherscan </a>
     </md-snackbar>
@@ -127,6 +127,7 @@ export default {
           (err) => {
             this.loading = false;
             this.isInTransaction = false;
+            this.$refs.snackbar.close();
             if (err) return;
             this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
           },
