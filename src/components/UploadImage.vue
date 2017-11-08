@@ -59,7 +59,7 @@
     </form>
     </md-layout>
     </md-layout>
-    <md-snackbar md-duration="Infinity" ref="snackbar">
+    <md-snackbar md-duration="60000" ref="snackbar">
       <span>Transaction pending. It usually takes less than a minute to process.</span>
       <a v-if="txHash" :href="'https://rinkeby.etherscan.io/tx/'+txHash" target="_blank"> View on etherscan </a>
     </md-snackbar>
