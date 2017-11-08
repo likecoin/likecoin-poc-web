@@ -14,6 +14,9 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { property: 'og:title', content: 'Meme Generator by LikeCoin Foundation' },
+      { property: 'og:description', content: 'Showcasing Content Footprint of LikeCoin' },
+      { property: 'og:image', content:'https://like.community/static/logo.png' },
     ],
     link: [
       { rel: 'icon', type: 'image/png', href: 'favicon.png' },
