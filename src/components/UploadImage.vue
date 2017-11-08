@@ -17,15 +17,16 @@
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Image upload</label>
-        <md-file v-model="image" @selected="previewImage" accept="image/*"></md-file>
+        <md-file v-model="image" @selected="previewImage" accept="image/*" required></md-file>
       </md-input-container>
       <md-input-container>
         <label>Author</label>
-        <md-input v-model="author"></md-input>
+        <md-input v-model="author" required></md-input>
       </md-input-container>
-      <md-input-container>
+      <md-input-container :class="isBadAddress?'md-input-invalid':''">
         <label>Author ETH wallet address</label>
-        <md-input v-model="wallet"></md-input>
+        <md-input v-model="wallet" maxlength="42" required />
+        <span v-if="isBadAddress" class="md-error">Invalid address format</span>
       </md-input-container>
       <md-input-container>
         <label>Description</label>
@@ -33,27 +34,27 @@
       </md-input-container>
       <md-input-container>
         <label>License</label>
-        <md-input v-model="license"></md-input>
+        <md-input v-model="license" required></md-input>
       </md-input-container>
       <hr />
-      <h2>Image parents</h2>
+<!--       <h2>Image parents</h2>
       <md-button class="md-icon-button" @click.native="addFootprint">
         <md-icon>playlist_add</md-icon>
       </md-button></h2>
       <div v-for="f in footprints">
         <md-input-container>
           <label>Parent content Fingerprint</label>
-          <md-input v-model="f.id"></md-input>
+          <md-input v-model="f.id" required></md-input>
         </md-input-container>
         <md-input-container>
           <label>Parent contribution %</label>
-          <md-input v-model="f.share"></md-input>
+          <md-input v-model="f.share" type="number" min="0" max="100" required></md-input>
         </md-input-container>
       </div>
       <md-button v-if="footprints && footprints.length > 0"
         class="md-icon-button" @click.native="removeFootprint">
         <md-icon>remove</md-icon>
-      </md-button>
+      </md-button> -->
       <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
     </md-layout>
@@ -80,11 +81,12 @@ export default {
       imageFile: null,
       author: '',
       description: '',
-      license: '',
+      license: 'cc',
       footprints: [],
-      wallet: EthHelper.getWallet(),
+      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       loading: false,
       isInTransaction: false,
+      isBadAddress: false,
       txHash: '',
     };
   },
@@ -109,13 +111,21 @@ export default {
         reader.readAsDataURL(files[0]);
       }
     },
+    checkAddress() {
+      return this.wallet.length === 42 && this.wallet.substr(0, 2) === '0x';
+    },
     addFootprint() {
-      this.footprints.push({ id: '', share: 0.1 });
+      this.footprints.push({ id: '', share: 10 });
     },
     removeFootprint() {
       this.footprints.pop();
     },
     onSubmit() {
+      this.isBadAddress = false;
+      if (!this.checkAddress()) {
+        this.isBadAddress = true;
+        return;
+      }
       this.loading = true;
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {
@@ -136,13 +146,12 @@ export default {
     },
   },
   mounted() {
-    if (!this.wallet) {
-      setTimeout(() => {
-        if (!this.wallet && EthHelper.getWallet()) {
-          this.wallet = EthHelper.getWallet();
-        }
-      }, 3000);
-    }
+    setTimeout(() => {
+      const localWallet = EthHelper.getWallet();
+      if (localWallet) {
+        this.wallet = localWallet;
+      }
+    }, 2000);
   },
 };
 </script>
