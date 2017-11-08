@@ -18,10 +18,16 @@
     <div class="inner-container"><router-view/></div>
     <div class="colorbar2" />
     <footer>
-      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-        <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-      </a>
-      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      <md-toolbar id="footer-nav" class="md-transparent">
+      <a href="https://like.community/"><span>by LikeCoin Foundation</span></a>
+      <md-layout md-flex md-align="center" md-vertical-align="center">
+      <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"><md-button>
+          <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+      </md-button></a>
+      <span>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</span>
+      </md-layout>
+      <span>LikeCoin content footprint - a proof of concept</span>
+      </md-toolbar>
     </footer>
   </div>
 </template>
@@ -115,8 +121,8 @@ li {
   margin: 20px;
 }
 
-footer {
-  margin-top: 20px;
+footer #footer-nav{
+  color: #6b6b6b;
 }
 
 .colorbar1 {
