@@ -23,9 +23,10 @@
         <label>Author</label>
         <md-input v-model="author" required></md-input>
       </md-input-container>
-      <md-input-container>
+      <md-input-container :class="isBadAddress?'md-input-invalid':''">
         <label>Author ETH wallet address</label>
-        <md-input v-model="wallet" required></md-input>
+        <md-input v-model="wallet" maxlength="42" required />
+        <span v-if="isBadAddress" class="md-error">Invalid address format</span>
       </md-input-container>
       <md-input-container>
         <label>Description</label>
@@ -36,7 +37,7 @@
         <md-input v-model="license" required></md-input>
       </md-input-container>
       <hr />
-      <h2>Image parents</h2>
+<!--       <h2>Image parents</h2>
       <md-button class="md-icon-button" @click.native="addFootprint">
         <md-icon>playlist_add</md-icon>
       </md-button></h2>
@@ -53,7 +54,7 @@
       <md-button v-if="footprints && footprints.length > 0"
         class="md-icon-button" @click.native="removeFootprint">
         <md-icon>remove</md-icon>
-      </md-button>
+      </md-button> -->
       <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
     </md-layout>
@@ -85,6 +86,7 @@ export default {
       wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       loading: false,
       isInTransaction: false,
+      isBadAddress: false,
       txHash: '',
     };
   },
@@ -109,6 +111,9 @@ export default {
         reader.readAsDataURL(files[0]);
       }
     },
+    checkAddress() {
+      return this.wallet.length === 42 && this.wallet.substr(0, 2) === '0x';
+    },
     addFootprint() {
       this.footprints.push({ id: '', share: 10 });
     },
@@ -116,6 +121,11 @@ export default {
       this.footprints.pop();
     },
     onSubmit() {
+      this.isBadAddress = false;
+      if (!this.checkAddress()) {
+        this.isBadAddress = true;
+        return;
+      }
       this.loading = true;
       api.apiPostUploadImage(this.getSerializedMetaData())
       .then((result) => {

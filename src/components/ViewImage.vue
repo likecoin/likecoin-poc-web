@@ -29,9 +29,10 @@
         <label>Author</label>
         <md-input v-model="author" required></md-input>
       </md-input-container>
-      <md-input-container>
+      <md-input-container :class="isBadAddress?'md-input-invalid':''">
         <label>Author ETH wallet address</label>
-        <md-input v-model="wallet" required></md-input>
+        <md-input v-model="wallet" maxlength="42" required />
+        <span v-if="isBadAddress" class="md-error">Invalid address format</span>
       </md-input-container>
       <md-input-container>
         <label>Description</label>
@@ -123,6 +124,7 @@ export default {
       topMemeText: '',
       loading: false,
       isInTransaction: false,
+      isBadAddress: false,
       txHash: '',
     };
   },
@@ -168,7 +170,15 @@ export default {
         footprints: JSON.stringify(footprints),
       };
     },
+    checkAddress() {
+      return this.wallet.length === 42 && this.wallet.substr(0, 2) === '0x';
+    },
     onSubmit() {
+      this.isBadAddress = false;
+      if (!this.checkAddress()) {
+        this.isBadAddress = true;
+        return;
+      }
       this.loading = true;
       api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
       .then((result) => {
@@ -193,7 +203,6 @@ export default {
     this.refreshImage(this.$route.params.uid);
     setTimeout(() => {
       const localWallet = EthHelper.getWallet();
-      console.log(localWallet);
       if (localWallet) {
         this.wallet = localWallet;
       }
