@@ -157,6 +157,10 @@ export default {
           this.ipfsHash = result.data.ipfs;
           this.uid = uid;
           this.footprintId = uid;
+        })
+        .catch((err) => {
+          this.errorMsg = err.response.data;
+          this.$refs.dialog.open();
         });
       }
     },
