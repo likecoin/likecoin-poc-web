@@ -9,7 +9,7 @@
         <md-tab md-label="Meme!">
         </md-tab>
       </md-tabs>
-      <md-layout md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
+      <md-layout md-align="center" md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
        class="image-view" v-for="(ipfs, id) in vList" :key="id">
         <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
           <md-ipfs-image :ipfsSrc="ipfs.ipfs" />

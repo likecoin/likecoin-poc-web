@@ -2,10 +2,11 @@
   <div class="uploadimage">
     <md-progress v-if="loading" md-indeterminate></md-progress>
     <md-layout md-gutter>
-    <md-layout md-align="center"
-      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
-      md-flex-large="40" md-flex-offset-large="5"
-      md-flex-xlarge="40" md-flex-offset-xlarge="5">
+    <md-layout md-align="center" md-column
+      md-flex-xsmall="100" md-flex-small="100"
+      md-flex-medium="80" md-flex-offset-medium="10"
+      md-flex-large="40"
+      md-flex-xlarge="50">
     <div class="image-preview">
       <md-image :md-src="imageData" />
     </div>
@@ -14,8 +15,6 @@
     <md-layout md-column md-gutter
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
       md-flex="50">
-    <md-card>
-    <md-card-content>
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Image upload</label>
@@ -58,8 +57,6 @@
       </md-button>
       <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
-    </md-card-content>
-    </md-card>
     </md-layout>
     </md-layout>
     <md-snackbar ref="snackbar">
@@ -163,4 +160,9 @@ li {
 a {
   color: #42b983;
 }
+
+form {
+  margin: 20px;
+}
+
 </style>
