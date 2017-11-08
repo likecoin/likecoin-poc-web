@@ -63,6 +63,10 @@
       <span>Transaction pending. It usually takes less than a minute to process.</span>
       <a v-if="txHash" :href="'https://rinkeby.etherscan.io/tx/'+txHash" target="_blank"> View on etherscan </a>
     </md-snackbar>
+    <md-dialog-alert
+      :md-content="errorMsg"
+      ref="dialog">
+    </md-dialog-alert>
   </div>
 </template>
 
@@ -88,6 +92,7 @@ export default {
       isInTransaction: false,
       isBadAddress: false,
       txHash: '',
+      errorMsg: 'No error',
     };
   },
   methods: {
@@ -142,6 +147,10 @@ export default {
             this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
           },
         );
+      })
+      .catch((err) => {
+        this.errorMsg = err.response.data;
+        this.$refs.dialog.open();
       });
     },
   },
