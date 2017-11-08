@@ -1,6 +1,6 @@
 <template>
   <div class="view">
-    <md-progress v-if="loading" md-indeterminate></md-progress>
+    <md-progress v-if="loading" :class="isInTransaction?'md-accent':''" md-indeterminate></md-progress>
     <md-layout md-gutter>
     <md-layout md-align="center" md-column
       md-flex-xsmall="100" md-flex-small="100"
@@ -11,7 +11,6 @@
         <md-spinner v-if="!ipfsHash" md-indeterminate />
         <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
       </div>
-    <md-progress v-if="loading" md-indeterminate></md-progress>
     </md-layout>
     <md-layout md-column md-gutter
       md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
@@ -92,8 +91,9 @@
     <span><md-button class="md-primary md-raised" v-if="!isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
     </md-layout>
     </md-layout>
-    <md-snackbar ref="snackbar">
+    <md-snackbar md-duration="30000" ref="snackbar">
       <span>Transaction pending. It usually takes less than a minute to process.</span>
+      <a v-if="txHash" :href="'https://rinkeby.etherscan.io/tx/'+txHash" target="_blank"> View on etherscan </a>
     </md-snackbar>
   </div>
 </template>
@@ -122,6 +122,8 @@ export default {
       memeText: '',
       topMemeText: '',
       loading: false,
+      isInTransaction: false,
+      txHash: '',
     };
   },
   components: {
@@ -168,13 +170,16 @@ export default {
     },
     onSubmit() {
       this.loading = true;
-      this.$refs.snackbar.open();
       api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
       .then((result) => {
+        this.$refs.snackbar.open();
+        this.isInTransaction = true;
+        this.txHash = result.data.txHash;
         EthHelper.waitForTxToBeMined(
           result.data.txHash,
           (err) => {
             this.loading = false;
+            this.isInTransaction = false;
             if (err) return;
             this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
             location.reload(); // refresh for better UX and less state problem
