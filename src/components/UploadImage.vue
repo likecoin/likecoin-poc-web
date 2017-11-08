@@ -17,15 +17,15 @@
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
         <label>Image upload</label>
-        <md-file v-model="image" @selected="previewImage" accept="image/*"></md-file>
+        <md-file v-model="image" @selected="previewImage" accept="image/*" required></md-file>
       </md-input-container>
       <md-input-container>
         <label>Author</label>
-        <md-input v-model="author"></md-input>
+        <md-input v-model="author" required></md-input>
       </md-input-container>
       <md-input-container>
         <label>Author ETH wallet address</label>
-        <md-input v-model="wallet"></md-input>
+        <md-input v-model="wallet" required></md-input>
       </md-input-container>
       <md-input-container>
         <label>Description</label>
@@ -33,7 +33,7 @@
       </md-input-container>
       <md-input-container>
         <label>License</label>
-        <md-input v-model="license"></md-input>
+        <md-input v-model="license" required></md-input>
       </md-input-container>
       <hr />
       <h2>Image parents</h2>
@@ -43,11 +43,11 @@
       <div v-for="f in footprints">
         <md-input-container>
           <label>Parent content Fingerprint</label>
-          <md-input v-model="f.id"></md-input>
+          <md-input v-model="f.id" required></md-input>
         </md-input-container>
         <md-input-container>
           <label>Parent contribution %</label>
-          <md-input v-model="f.share"></md-input>
+          <md-input v-model="f.share" type="number" min="0" max="100" required></md-input>
         </md-input-container>
       </div>
       <md-button v-if="footprints && footprints.length > 0"
@@ -80,9 +80,9 @@ export default {
       imageFile: null,
       author: '',
       description: '',
-      license: '',
+      license: 'cc',
       footprints: [],
-      wallet: EthHelper.getWallet(),
+      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       loading: false,
       isInTransaction: false,
       txHash: '',
@@ -110,7 +110,7 @@ export default {
       }
     },
     addFootprint() {
-      this.footprints.push({ id: '', share: 0.1 });
+      this.footprints.push({ id: '', share: 10 });
     },
     removeFootprint() {
       this.footprints.pop();
@@ -136,13 +136,12 @@ export default {
     },
   },
   mounted() {
-    if (!this.wallet) {
-      setTimeout(() => {
-        if (!this.wallet && EthHelper.getWallet()) {
-          this.wallet = EthHelper.getWallet();
-        }
-      }, 3000);
-    }
+    setTimeout(() => {
+      const localWallet = EthHelper.getWallet();
+      if (localWallet) {
+        this.wallet = localWallet;
+      }
+    }, 2000);
   },
 };
 </script>

@@ -27,11 +27,11 @@
       </md-input-container>
       <md-input-container>
         <label>Author</label>
-        <md-input v-model="author"></md-input>
+        <md-input v-model="author" required></md-input>
       </md-input-container>
       <md-input-container>
         <label>Author ETH wallet address</label>
-        <md-input v-model="wallet"></md-input>
+        <md-input v-model="wallet" required></md-input>
       </md-input-container>
       <md-input-container>
         <label>Description</label>
@@ -39,18 +39,18 @@
       </md-input-container>
       <md-input-container>
         <label>License</label>
-        <md-input v-model="license"></md-input>
+        <md-input v-model="license" required></md-input>
       </md-input-container>
       <hr />
       <h2>Image parents</h2>
       <div>
         <md-input-container>
           <label>Parent content Fingerprint</label>
-          <md-input disabled v-model="footprintId"></md-input>
+          <md-input disabled v-model="footprintId" required></md-input>
         </md-input-container>
         <md-input-container>
           <label>Parent contribution %</label>
-          <md-input v-model="footprintShare"></md-input>
+          <md-input v-model="footprintShare" type="number" min="0" max="100" required></md-input>
         </md-input-container>
       </div>
       <md-button @click="isMemeing=false">Cancel</md-button>
@@ -111,9 +111,9 @@ export default {
     return {
       uid: '',
       author: '',
-      wallet: '',
+      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       description: '',
-      license: '',
+      license: 'cc',
       ipfsHash: '',
       metadata: {},
       footprintId: '',
@@ -191,13 +191,13 @@ export default {
   },
   mounted() {
     this.refreshImage(this.$route.params.uid);
-    if (!this.wallet) {
-      setTimeout(() => {
-        if (!this.wallet && EthHelper.getWallet()) {
-          this.wallet = EthHelper.getWallet();
-        }
-      }, 3000);
-    }
+    setTimeout(() => {
+      const localWallet = EthHelper.getWallet();
+      console.log(localWallet);
+      if (localWallet) {
+        this.wallet = localWallet;
+      }
+    }, 2000);
   },
   beforeRouteUpdate(to, from, next) {
     this.refreshImage(to.params.uid);

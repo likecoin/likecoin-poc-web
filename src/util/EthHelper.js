@@ -9,7 +9,7 @@ class EthHelper {
   initApp(errCb, clearErrCb) {
     this.errCb = errCb;
     this.clearErrCb = clearErrCb;
-    setTimeout(() => this.pollForWeb3(), 3000);
+    setTimeout(() => this.pollForWeb3(), 1000);
   }
 
   pollForWeb3() {
