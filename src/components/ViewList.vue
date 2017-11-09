@@ -26,6 +26,8 @@ import MdIpfsImage from './MdIpfsImage';
 
 const abi = require('web3-eth-abi');
 
+const LIST_SIZE = 16;
+
 export default {
   name: 'ViewList',
   data() {
@@ -40,15 +42,15 @@ export default {
   computed: {
     newList() {
       const decodeList = this.completeList;
-      return decodeList.slice(decodeList.length - 10, decodeList.length).reverse();
+      return decodeList.slice(decodeList.length - LIST_SIZE, decodeList.length).reverse();
     },
     originalList() {
       const list = this.completeList.filter(v => !v.isOriginal);
-      return list.slice(list.length - 10, list.length).reverse();
+      return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
     memeList() {
       const list = this.completeList.filter(v => v.isOriginal);
-      return list.slice(list.length - 10, list.length).reverse();
+      return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
   },
   methods: {
