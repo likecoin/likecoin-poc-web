@@ -6,24 +6,31 @@
       md-flex-medium="100"
       md-flex-large="40"
       md-flex="50">
-      <div class="image-view">
+      <div v-if="uid" class="image-view">
         <md-spinner v-if="!ipfsHash" md-indeterminate />
         <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
+      </div>
+      <div v-else class="image-preview">
+        <md-image :md-src="imageData" />
       </div>
     </md-layout>
     <md-layout md-column
       md-flex-medium="100"
       md-flex-large="60"
       md-flex="50">
-    <form v-if="isMemeing" id="imageMetadata" v-on:submit.prevent="onSubmit">
-      <md-input-container md-flex="50" class="md-input-invalid">
+    <form v-if="isShowForm" id="imageMetadata" v-on:submit.prevent="onSubmit">
+      <md-input-container v-if="!isMemeing">
+        <label>Image upload</label>
+        <md-file v-model="image" @selected="previewImage" accept="image/*" required></md-file>
+      </md-input-container>
+      <div v-else><md-input-container md-flex="50" class="md-input-invalid">
         <label>Top Meme Text</label>
         <md-textarea placeholder=">PUT MEME HERE" v-model="topMemeText"></md-textarea>
       </md-input-container>
       <md-input-container md-flex="50" class="md-input-invalid">
         <label>Bottom Meme Text</label>
         <md-textarea placeholder=">PUT MEME HERE" v-model="memeText"></md-textarea>
-      </md-input-container>
+      </md-input-container></div>
       <md-input-container>
         <label>Author</label>
         <md-input v-model="author" required></md-input>
@@ -42,8 +49,25 @@
         <md-input v-model="license" required></md-input>
       </md-input-container>
       <hr />
-      <h2>Image parents</h2>
-      <div>
+      <div v-if="isMemeing">
+        <h2>Image parents</h2>
+<!--    <md-button class="md-icon-button" @click.native="addFootprint">
+          <md-icon>playlist_add</md-icon>
+        </md-button></h2>
+        <div v-for="f in footprints">
+          <md-input-container>
+            <label>Parent content Fingerprint</label>
+            <md-input v-model="f.id" required></md-input>
+          </md-input-container>
+          <md-input-container>
+            <label>Parent contribution %</label>
+            <md-input v-model="f.share" type="number" min="0" max="100" required></md-input>
+          </md-input-container>
+        </div>
+        <md-button v-if="footprints && footprints.length > 0"
+          class="md-icon-button" @click.native="removeFootprint">
+          <md-icon>remove</md-icon>
+        </md-button> -->
         <md-input-container>
           <label>Parent content Fingerprint</label>
           <md-input disabled v-model="footprintId" required></md-input>
@@ -53,7 +77,7 @@
           <md-input v-model="footprintShare" type="number" min="0" max="100" required></md-input>
         </md-input-container>
       </div>
-      <md-button @click="isMemeing=false">Cancel</md-button>
+      <md-button v-if="isMemeing" @click="isMemeing=false">Cancel</md-button>
       <md-button class="md-raised" type="submit" form="imageMetadata">OK</md-button>
     </form>
     <div class="metadatas" v-else>
@@ -73,7 +97,7 @@
         </md-table-body>
       </md-table>
       <hr />
-      <md-table v-if="footprints && footprints.length > 0">
+      <md-table v-if="metafootprints && metafootprints.length > 0">
         <md-table-header>
           <md-table-row>
             <md-table-head>Parent content Fingerprint</md-table-head>
@@ -81,14 +105,14 @@
           </md-table-row>
         </md-table-header>
         <md-table-body>
-          <md-table-row  v-for="(k, i) in footprints" :key="k">
+          <md-table-row  v-for="(k, i) in metafootprints" :key="k">
             <md-table-cell><router-link :to="{ name: 'ViewImage', params: { uid: k }}"> {{ k }}</router-link></md-table-cell>
             <md-table-cell>{{ parseInt(footprintShares[i], 16) }}</md-table-cell>
           </md-table-row>
         </md-table-body>
       </md-table>
     </div>
-    <span><md-button class="md-primary md-raised" v-if="!isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
+    <span><md-button class="md-primary md-raised" v-if="uid && !isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
     </md-layout>
     </md-layout>
     <md-snackbar md-duration="60000" ref="snackbar">
@@ -105,8 +129,9 @@
 <script>
 import moment from 'moment';
 
-import * as api from '@/api/api';
+import defaultImage from '@/assets/logo.png';
 import EthHelper from '@/util/EthHelper';
+import * as api from '@/api/api';
 import MdIpfsImage from './MdIpfsImage';
 
 export default {
@@ -114,8 +139,10 @@ export default {
   data() {
     return {
       uid: '',
+      imageData: defaultImage,
+      image: null,
+      imageFile: null,
       author: '',
-      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       description: '',
       license: 'cc',
       ipfsHash: '',
@@ -125,6 +152,8 @@ export default {
       isMemeing: false,
       memeText: '',
       topMemeText: '',
+      footprints: [],
+      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
       loading: false,
       isInTransaction: false,
       isBadAddress: false,
@@ -139,11 +168,14 @@ export default {
     imgUrl() {
       return `${this.ipfsHash}`;
     },
-    footprints() {
+    metafootprints() {
       return this.metadata.footprintIds;
     },
     footprintShares() {
       return this.metadata.footprintShares;
+    },
+    isShowForm() {
+      return (!this.uid || this.isMemeing);
     },
   },
   methods: {
@@ -168,9 +200,10 @@ export default {
       return moment(t).format('YYYY-MM-DD HH:mm:ss');
     },
     getSerializedMetaData() {
-      const { author, wallet, description, license, footprintId, footprintShare } = this;
-      const footprints = [{ id: footprintId, share: footprintShare }];
-      return {
+      const { imageFile, author, wallet, description, license, footprintId, footprintShare } = this;
+      const footprints = this.isMemeing ?
+        [{ id: footprintId, share: footprintShare }] : this.footprints;
+      return { image: imageFile,
         author,
         wallet,
         description,
@@ -178,8 +211,24 @@ export default {
         footprints: JSON.stringify(footprints),
       };
     },
+    previewImage(files) {
+      if (files && files[0]) {
+        this.imageFile = files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.imageData = e.target.result;
+        };
+        reader.readAsDataURL(files[0]);
+      }
+    },
     checkAddress() {
       return this.wallet.length === 42 && this.wallet.substr(0, 2) === '0x';
+    },
+    addFootprint() {
+      this.footprints.push({ id: '', share: 10 });
+    },
+    removeFootprint() {
+      this.footprints.pop();
     },
     onSubmit() {
       this.isBadAddress = false;
@@ -188,7 +237,14 @@ export default {
         return;
       }
       this.loading = true;
-      api.apiPostMeme(this.uid, this.topMemeText, this.memeText, this.getSerializedMetaData())
+      let targetApi = null;
+      if (this.isMemeing) {
+        targetApi = api.apiPostMeme(this.uid, this.topMemeText,
+          this.memeText, this.getSerializedMetaData());
+      } else {
+        targetApi = api.apiPostUploadImage(this.getSerializedMetaData());
+      }
+      targetApi
       .then((result) => {
         this.$refs.snackbar.open();
         this.isInTransaction = true;
@@ -201,7 +257,7 @@ export default {
             this.$refs.snackbar.close();
             if (err) return;
             this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
-            location.reload(); // refresh for better UX and less state problem
+            if (this.isMemeing) location.reload(); // refresh for better UX and less state problem
           },
         );
       })
@@ -212,7 +268,10 @@ export default {
     },
   },
   mounted() {
-    this.refreshImage(this.$route.params.uid);
+    this.uid = this.$route.params.uid || '';
+    if (this.uid) {
+      this.refreshImage(this.uid);
+    }
     setTimeout(() => {
       const localWallet = EthHelper.getWallet();
       if (localWallet) {
@@ -221,7 +280,10 @@ export default {
     }, 2000);
   },
   beforeRouteUpdate(to, from, next) {
-    this.refreshImage(to.params.uid);
+    this.uid = to.params.uid || '';
+    if (this.uid) {
+      this.refreshImage(this.uid);
+    }
     next();
   },
 };
