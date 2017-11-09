@@ -3,16 +3,14 @@
     <md-progress v-if="loading" :class="isInTransaction?'md-accent':''" md-indeterminate></md-progress>
     <md-layout md-gutter>
     <md-layout md-align="center" md-column
-      md-flex-xsmall="100" md-flex-small="100"
-      md-flex-medium="80" md-flex-offset-medium="10"
-      md-flex-large="40"
-      md-flex-xlarge="50">
+      md-flex-medium="100"
+      md-flex="50">
     <div class="image-preview">
       <md-image :md-src="imageData" />
     </div>
     </md-layout>
-    <md-layout md-column md-gutter
-      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
+    <md-layout md-column
+      md-flex-medium="100"
       md-flex="50">
     <form id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container>
@@ -185,8 +183,10 @@ a {
   color: #42b983;
 }
 
-form {
-  margin: 20px;
+@media (min-width:1264px) {
+  form {
+    margin: 20px;
+  }
 }
 
 </style>
