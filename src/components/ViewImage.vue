@@ -3,18 +3,17 @@
     <md-progress v-if="loading" :class="isInTransaction?'md-accent':''" md-indeterminate></md-progress>
     <md-layout md-gutter>
     <md-layout md-align="center" md-column
-      md-flex-xsmall="100" md-flex-small="100"
-      md-flex-medium="80" md-flex-offset-medium="10"
+      md-flex-medium="100"
       md-flex-large="40"
-      md-flex-xlarge="50">
+      md-flex="50">
       <div class="image-view">
         <md-spinner v-if="!ipfsHash" md-indeterminate />
         <md-ipfs-image  v-else :ipfsSrc="imgUrl" />
       </div>
     </md-layout>
-    <md-layout md-column md-gutter
-      md-flex-xsmall="100" md-flex-small="100" md-flex-medium="100"
-      md-flex-large = "60"
+    <md-layout md-column
+      md-flex-medium="100"
+      md-flex-large="60"
       md-flex="50">
     <form v-if="isMemeing" id="imageMetadata" v-on:submit.prevent="onSubmit">
       <md-input-container md-flex="50" class="md-input-invalid">
@@ -248,12 +247,10 @@ a {
   color: #42b983;
 }
 
-form {
-  margin: 20px;
-}
-
-.metadatas {
-  margin: 20px;
+@media (min-width:1264px) {
+  form, .metadatas {
+    margin: 20px;
+  }
 }
 
 </style>
