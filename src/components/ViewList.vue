@@ -2,36 +2,38 @@
   <div class="view">
     <md-layout md-gutter>
       <md-tabs md-right class="md-transparent" @change="onTabChange">
-        <md-tab md-label="Latest">
-        </md-tab>
-        <md-tab md-label="Original">
-        </md-tab>
-        <md-tab md-label="Meme!">
-        </md-tab>
+        <md-tab md-label="GraphView" />
+        <md-tab md-label="Latest" />
+        <md-tab md-label="Original" />
+        <md-tab md-label="Meme!" />
       </md-tabs>
-      <md-layout md-align="center" md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
-       class="image-view" v-for="(ipfs, id) in vList" :key="id">
-        <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
-          <md-ipfs-image :ipfsSrc="ipfs.ipfs" />
-        </router-link>
+      <md-layout v-if="!isGraph">
+        <md-layout md-align="center" md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
+         class="image-view" v-for="(ipfs, id) in vList" :key="id">
+          <router-link :to="{ name: 'ViewImage', params: { uid: ipfs.id }}">
+            <md-ipfs-image :ipfsSrc="ipfs.ipfs" />
+          </router-link>
+        </md-layout>
       </md-layout>
-    </md-layout>
-    <md-layout md-flex="100"><svg width="1920" height="1080">
-      <transition-group tag="g" name="line" >
-        <path v-for="link in links" class="link" v-bind:key="link.id" v-bind:d="link.d" v-bind:style="link.style"></path>
-      </transition-group>
-        <transition-group tag="g" name="list">
-        <g class="node" v-for="(node, index) in nodes" v-bind:key="node.id" v-bind:style="node.style" v-bind:class="[node.className, {'highlight': node.highlight}]">
-
-          <!-- Circles for each node -->
-
-          <circle v-bind:r="node.r" v-bind:style="'#bfbfbf'"></circle>
-
-          <a :href="'/#/view/'+node.text"><text v-bind:dx="node.textpos.x" v-bind:dy="node.textpos.y" v-bind:style="node.textStyle">{{ node.text }}</text></a>
-
+      <md-layout v-else md-flex="100"><svg width="1920" height="1920">
+        <g style="transform: translate(500px, 500px)">
+          <clipPath id="cicleClipPath">
+            <circle r="40"/>
+          </clipPath>
+          <transition-group tag="g" name="line" >
+            <path v-for="link in links" class="link" v-bind:key="link.id" v-bind:d="link.d" v-bind:style="link.style"></path>
+          </transition-group>
+          <transition-group tag="g" name="list">
+          <g class="node" v-for="node in renderNodes" v-bind:key="node.id" v-bind:style="node.style" v-bind:class="[node.className, {'highlight': node.highlight}]">
+            <a :href="'/#/view/'+node.text">
+            <circle v-bind:r="node.r" v-bind:style="'#bfbfbf'"></circle>
+            <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
+             height="100" width="100" x="-50" y="-50" /></a>
+          </g>
+        </transition-group>
         </g>
-      </transition-group>
-    </svg></md-layout>
+      </svg></md-layout>
+    </md-layout>
   </div>
 </template>
 
@@ -46,11 +48,17 @@ const abi = require('web3-eth-abi');
 
 const LIST_SIZE = 16;
 
+function radialPoint(x, y) {
+  return [y * Math.cos(x - (Math.PI / 2)), y * Math.sin(x - (Math.PI / 2))];
+}
+
 export default {
   name: 'ViewList',
   data() {
     return {
       vList: [],
+      nodes: [],
+      isGraph: false,
       root: null,
       completeList: [],
     };
@@ -71,12 +79,14 @@ export default {
       const list = this.completeList.filter(v => !v.isOriginal);
       return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
-    nodes() {
-      if (this.root) {
-        return this.root.descendants().map((d) => {
-          const transform = `translate(${d.y}px, ${d.x}px)`;
+    renderNodes() {
+      if (this.nodes) {
+        return this.nodes.map((d) => {
+          const [x, y] = radialPoint(d.x, d.y);
+          const transform = `translate(${x}px, ${y}px)`;
           return {
             id: d.id,
+            ipfs: d.data.ipfs,
             r: 2.5,
             text: d.id,
             style: {
@@ -96,10 +106,12 @@ export default {
     },
     links() {
       if (this.root) {
-        return this.root.descendants().slice(1).map((d) => {
-          const l = `M${d.y},${d.x}C${d.parent.y + 100},${d.x} ${d.parent.y + 100},${d.parent.x} ${d.parent.y},${d.parent.x}`;
+        return this.root.links().map((d) => {
+          const l = d3.linkRadial()
+                     .angle(i => i.x)
+                     .radius(i => i.y)(d);
           return {
-            id: d.id,
+            id: d.source.id + d.target.id,
             d: l,
             style: {
               stroke: '#ff0000',
@@ -136,7 +148,6 @@ export default {
           };
         });
         this.completeList = decodeList; // .slice(decodeList.length - 100, decodeList.length);
-        d3.select('svg');
         this.root = d3.stratify()
                       .id(i => i.id)
                       .parentId((i) => {
@@ -145,7 +156,8 @@ export default {
                         return i.parent;
                       })([...decodeList, { id: 'root', parentId: 'root' }]);
         const tree = d3.tree()
-                     .size([1920, 1080])(this.root);
+                     .size([2 * Math.PI, 500])
+                     .separation((a, b) => (a.parent === b.parent ? 2 : 3) / a.depth)(this.root);
         this.nodes = tree.descendants();
         this.vList = this.newList;
       })
@@ -155,9 +167,10 @@ export default {
       });
     },
     onTabChange(index) {
-      if (index === 0) this.vList = this.newList;
-      else if (index === 1) this.vList = this.originalList;
-      else if (index === 2) this.vList = this.memeList;
+      this.isGraph = (index === 0);
+      if (index === 1) this.vList = this.newList;
+      else if (index === 2) this.vList = this.originalList;
+      else if (index === 3) this.vList = this.memeList;
     },
   },
   mounted() {
