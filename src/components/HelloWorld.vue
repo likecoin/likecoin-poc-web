@@ -15,7 +15,7 @@
       </md-layout>
     </md-toolbar>
     <md-toolbar v-if="errMsg"><md-spinner md-indeterminate class="md-warn" /><md-icon class="md-warn">warning</md-icon><md-layout v-html="errMsg" /></md-toolbar>
-    <div class="inner-container"><router-view/></div>
+    <div class="inner-container"><router-view :key="$route.path" /></div>
     <div class="colorbar2" />
     <footer>
       <md-toolbar id="footer-nav" class="md-transparent">
