@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.17.0",
+    "d3": "^4.11.0",
     "ethjs": "^0.2.8",
     "ethjs-contract": "^0.1.9",
     "moment": "^2.19.1",
