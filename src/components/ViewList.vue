@@ -2,10 +2,10 @@
   <div class="view">
     <md-layout md-gutter>
       <md-tabs md-right class="md-transparent" @change="onTabChange">
-        <md-tab md-label="GraphView" />
         <md-tab md-label="Latest" />
         <md-tab md-label="Original" />
-        <md-tab md-label="Meme!" />
+        <md-tab md-label="Meme" />
+        <md-tab md-label="ALL" />
       </md-tabs>
       <md-layout v-if="!isGraph">
         <md-layout md-align="center" md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
@@ -16,7 +16,7 @@
         </md-layout>
       </md-layout>
       <md-layout v-else md-flex="100"><svg :width="windowWidth" :height="renderRadius*2" :style="`height:${renderRadius*2}`">
-        <g :style="`transform: translate(${renderRadius}px, ${renderRadius}px)`">
+        <g :style="`transform: translate(${Math.max(windowWidth/2, renderRadius)}px, ${renderRadius}px)`">
           <clipPath id="cicleClipPath">
             <circle :r="`${renderRadius/16}`"/>
           </clipPath>
@@ -33,7 +33,7 @@
           <transition-group tag="g" name="list">
           <g class="node" v-for="node in renderNodes" v-bind:key="node.id" v-bind:style="node.style">
             <a :href="'/#/view/'+node.url">
-            <circle v-bind:r="node.r" v-bind:style="'#bfbfbf'"></circle>
+            <title>{{ node.description }}</title>
             <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
              :height="`${renderRadius/7}`" :width="`${renderRadius/7}`" :x="`${-renderRadius/14}`" :y="`${-renderRadius/14}`" /></a>
           </g>
@@ -90,7 +90,7 @@ export default {
       return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
     renderRadius() {
-      return Math.max(this.windowHeight, this.windowWidth) / 2;
+      return Math.max(this.windowHeight, this.windowWidth) * 0.4;
     },
     nodes() {
       if (this.tree) return this.tree.descendants();
@@ -104,6 +104,7 @@ export default {
           return {
             id: d.id,
             ipfs: d.data.ipfs,
+            description: d.data.description,
             url: d.id === 'root' ? '' : d.id,
             style: {
               transform,
@@ -122,9 +123,6 @@ export default {
           return {
             id: d.source.id + d.target.id,
             d: l,
-            style: {
-              stroke: '#ff0000',
-            },
           };
         });
       }
@@ -152,6 +150,7 @@ export default {
           return {
             id: r.topics[1],
             ipfs: decode.ipfs,
+            description: decode.description,
             isOriginal,
             parent: isOriginal ? '' : decode.footprintKeys[0],
           };
@@ -166,10 +165,10 @@ export default {
       });
     },
     onTabChange(index) {
-      this.isGraph = (index === 0);
-      if (index === 1) this.vList = this.newList;
-      else if (index === 2) this.vList = this.originalList;
-      else if (index === 3) this.vList = this.memeList;
+      this.isGraph = (index === 3);
+      if (index === 0) this.vList = this.newList;
+      else if (index === 1) this.vList = this.originalList;
+      else if (index === 2) this.vList = this.memeList;
     },
     setWindowWidth() {
       this.windowWidth = document.documentElement.clientWidth;
