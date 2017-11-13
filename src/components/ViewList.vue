@@ -20,12 +20,19 @@
           <clipPath id="cicleClipPath">
             <circle :r="`${renderRadius/16}`"/>
           </clipPath>
+          <radialGradient id="svg-gradient">
+            <stop offset="0%"   stop-color="#a8ff97"/>
+            <stop offset="30%"  stop-color="#69ecf1"/>
+            <stop offset="51%"   stop-color="#77c9f5"/>
+            <stop offset="77%"   stop-color="#b792ff"/>
+            <stop offset="100%" stop-color="#fe7ba0"/>
+          </radialGradient>
           <transition-group tag="g" name="line" >
-            <path v-for="link in links" class="link" v-bind:key="link.id" v-bind:d="link.d" v-bind:style="link.style"></path>
+            <path v-for="link in links" class="link" v-bind:key="link.id" v-bind:d="link.d" ></path>
           </transition-group>
           <transition-group tag="g" name="list">
-          <g class="node" v-for="node in renderNodes" v-bind:key="node.id" v-bind:style="node.style" v-bind:class="[node.className, {'highlight': node.highlight}]">
-            <a :href="'/#/view/'+node.text">
+          <g class="node" v-for="node in renderNodes" v-bind:key="node.id" v-bind:style="node.style">
+            <a :href="'/#/view/'+node.url">
             <circle v-bind:r="node.r" v-bind:style="'#bfbfbf'"></circle>
             <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
              :height="`${renderRadius/7}`" :width="`${renderRadius/7}`" :x="`${-renderRadius/14}`" :y="`${-renderRadius/14}`" /></a>
@@ -97,8 +104,7 @@ export default {
           return {
             id: d.id,
             ipfs: d.data.ipfs,
-            r: 2.5,
-            text: d.id,
+            url: d.id === 'root' ? '' : d.id,
             style: {
               transform,
             },
@@ -237,8 +243,8 @@ a {
 
 .link {
   fill: none;
-  stroke: #555;
-  stroke-opacity: 0.4;
+  stroke-opacity: 0.8;
+  stroke: url(#svg-gradient);
   stroke-width: 1.5px;
   stroke-dasharray: 1000;
 }
