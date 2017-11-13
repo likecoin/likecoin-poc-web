@@ -31,5 +31,6 @@ export default new Router({
         },
       ],
     },
+    { path: '/view', redirect: { name: 'UploadImage' } },
   ],
 });
