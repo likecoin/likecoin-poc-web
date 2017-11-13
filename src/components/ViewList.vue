@@ -15,10 +15,10 @@
           </router-link>
         </md-layout>
       </md-layout>
-      <md-layout v-else md-flex="100"><svg width="1920" height="1920">
-        <g style="transform: translate(500px, 500px)">
+      <md-layout v-else md-flex="100"><svg :width="windowWidth" :height="renderRadius*2" :style="`height:${renderRadius*2}`">
+        <g :style="`transform: translate(${renderRadius}px, ${renderRadius}px)`">
           <clipPath id="cicleClipPath">
-            <circle r="40"/>
+            <circle :r="`${renderRadius/16}`"/>
           </clipPath>
           <transition-group tag="g" name="line" >
             <path v-for="link in links" class="link" v-bind:key="link.id" v-bind:d="link.d" v-bind:style="link.style"></path>
@@ -28,7 +28,7 @@
             <a :href="'/#/view/'+node.text">
             <circle v-bind:r="node.r" v-bind:style="'#bfbfbf'"></circle>
             <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
-             height="100" width="100" x="-50" y="-50" /></a>
+             :height="`${renderRadius/7}`" :width="`${renderRadius/7}`" :x="`${-renderRadius/14}`" :y="`${-renderRadius/14}`" /></a>
           </g>
         </transition-group>
         </g>
@@ -39,6 +39,7 @@
 
 <script>
 import * as d3 from 'd3';
+import * as _debounce from 'lodash.debounce';
 
 import * as api from '@/api/api';
 import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS, RINKEBY_ID } from '@/constant/contract/likemedia';
@@ -56,11 +57,13 @@ export default {
   name: 'ViewList',
   data() {
     return {
-      vList: [],
-      nodes: [],
-      isGraph: false,
       root: null,
+      tree: null,
+      vList: [],
+      isGraph: false,
       completeList: [],
+      windowWidth: 0,
+      windowHeight: 0,
     };
   },
   components: {
@@ -79,6 +82,13 @@ export default {
       const list = this.completeList.filter(v => !v.isOriginal);
       return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
+    renderRadius() {
+      return Math.max(this.windowHeight, this.windowWidth) / 2;
+    },
+    nodes() {
+      if (this.tree) return this.tree.descendants();
+      return [];
+    },
     renderNodes() {
       if (this.nodes) {
         return this.nodes.map((d) => {
@@ -91,13 +101,6 @@ export default {
             text: d.id,
             style: {
               transform,
-            },
-            textpos: {
-              x: d.children ? -8 : 8,
-              y: 3,
-            },
-            textStyle: {
-              textAnchor: 'start',
             },
           };
         });
@@ -148,17 +151,7 @@ export default {
           };
         });
         this.completeList = decodeList; // .slice(decodeList.length - 100, decodeList.length);
-        this.root = d3.stratify()
-                      .id(i => i.id)
-                      .parentId((i) => {
-                        if (i.parent === 'root') return '';
-                        if (i.parent === '') return 'root';
-                        return i.parent;
-                      })([...decodeList, { id: 'root', parentId: 'root' }]);
-        const tree = d3.tree()
-                     .size([2 * Math.PI, 500])
-                     .separation((a, b) => (a.parent === b.parent ? 2 : 3) / a.depth)(this.root);
-        this.nodes = tree.descendants();
+        this.rerenderD3Tree();
         this.vList = this.newList;
       })
       .catch((response) => {
@@ -172,11 +165,47 @@ export default {
       else if (index === 2) this.vList = this.originalList;
       else if (index === 3) this.vList = this.memeList;
     },
+    setWindowWidth() {
+      this.windowWidth = document.documentElement.clientWidth;
+    },
+    setWindowHeight() {
+      this.windowHeight = document.documentElement.clientHeight;
+    },
+    rerenderD3Tree() {
+      const list = this.completeList;
+      const root = d3.stratify()
+                    .id(i => i.id)
+                    .parentId((i) => {
+                      if (i.parent === 'root') return '';
+                      if (i.parent === '') return 'root';
+                      return i.parent;
+                    })([...list, { id: 'root', parentId: 'root', ipfs: 'QmXYnyfRQX2XdNz5mxj1sdJ58AbHYstwJVtUveazumCtCE' }]);
+      const tree = d3.tree()
+                   .size([2 * Math.PI, this.renderRadius])
+                   .separation((a, b) => (a.parent === b.parent ? 2 : 3) / a.depth)(root);
+      this.root = root;
+      this.tree = tree;
+    },
   },
   mounted() {
     const eventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' && obj.name === 'Uploaded'));
     const signature = abi.encodeEventSignature(eventObj);
     this.refreshList(eventObj, signature);
+    this.$nextTick(() => {
+      window.addEventListener('resize', _debounce(this.setWindowWidth));
+      window.addEventListener('resize', _debounce(this.setWindowHeight));
+      this.setWindowWidth();
+      this.setWindowHeight();
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', _debounce(this.setWindowWidth));
+    window.removeEventListener('resize', _debounce(this.setWindowHeight));
+  },
+  watch: {
+    renderRadius() {
+      this.rerenderD3Tree();
+    },
   },
 };
 </script>
