@@ -32,9 +32,10 @@
           </transition-group>
           <transition-group tag="g" name="list">
           <g class="node" v-for="node in renderNodes" v-bind:key="node.id" v-bind:style="node.style">
-            <a :href="'/#/view/'+node.url">
+            <a :href="'/#/view/'+node.url" :xlink:href="'/#/view/'+node.url">
             <title>{{ node.description }}</title>
             <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
+             :xlink:href="'https://meme.like.community/ipfs/'+node.ipfs"
              :height="`${renderRadius/7}`" :width="`${renderRadius/7}`" :x="`${-renderRadius/14}`" :y="`${-renderRadius/14}`" /></a>
           </g>
         </transition-group>
@@ -90,7 +91,7 @@ export default {
       return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
     renderRadius() {
-      return Math.max(this.windowHeight, this.windowWidth) * 0.4;
+      return this.windowWidth * 0.4;
     },
     nodes() {
       if (this.tree) return this.tree.descendants();
