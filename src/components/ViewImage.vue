@@ -256,8 +256,10 @@ export default {
             this.isInTransaction = false;
             this.$refs.snackbar.close();
             if (err) return;
-            this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
-            if (this.isMemeing) location.reload(); // refresh for better UX and less state problem
+            setTimeout(() => {
+              this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
+              if (this.isMemeing) location.reload(); // refresh for better UX and less state problem
+            }, 1000); // wait 1 second try to avoid strange stream issue
           },
         );
       })
