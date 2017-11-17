@@ -1,8 +1,8 @@
 <template>
   <svg :width="windowWidth" :height="renderRadius*2" :style="`height:${renderRadius*2}`">
-    <g :style="`transform: translate(${Math.max(windowWidth/2, renderRadius)}px, ${renderRadius}px)`">
+    <g ref="graph"><g :style="`transform: translate(${Math.max(windowWidth/2, renderRadius)}px, ${renderRadius}px)`">
       <clipPath id="cicleClipPath">
-        <circle :r="`${renderRadius/16}`"/>
+        <circle :r="`${nodeRadius}`"/>
       </clipPath>
       <radialGradient id="svg-gradient">
         <stop offset="0%"   stop-color="#a8ff97"/>
@@ -20,15 +20,16 @@
           <title>{{ node.description }}</title>
           <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
            :xlink:href="'https://meme.like.community/ipfs/'+node.ipfs"
-           :height="`${renderRadius/7}`" :width="`${renderRadius/7}`" :x="`${-renderRadius/14}`" :y="`${-renderRadius/14}`" /></a>
+           :height="`${nodeSize}`" :width="`${nodeSize}`" :x="`${-nodeRadius}`" :y="`${-nodeRadius}`" /></a>
         </g>
       </transition-group>
-    </g>
+    </g></g>
   </svg>
 </template>
 
 <script>
 import * as d3 from 'd3';
+import * as panzoom from 'panzoom';
 import * as _debounce from 'lodash.debounce';
 
 function radialPoint(x, y) {
@@ -44,13 +45,24 @@ export default {
     return {
       root: null,
       tree: null,
+      panzoom: null,
       windowWidth: 0,
       windowHeight: 0,
+      nodeScale: 1,
     };
   },
   computed: {
     renderRadius() {
       return this.windowWidth * 0.4;
+    },
+    nodeBase() {
+      return this.renderRadius * this.nodeScale;
+    },
+    nodeSize() {
+      return this.nodeBase / 7;
+    },
+    nodeRadius() {
+      return this.nodeBase / 14;
     },
     nodes() {
       if (this.tree) return this.tree.descendants();
@@ -116,8 +128,13 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', _debounce(this.setWindowWidth));
       window.addEventListener('resize', _debounce(this.setWindowHeight));
+      document.body.addEventListener('zoom', () => {
+        const trans = this.panzoom.getTransform();
+        if (trans) this.nodeScale = Math.min(1, (1 / trans.scale));
+      }, true);
       this.setWindowWidth();
       this.setWindowHeight();
+      this.panzoom = panzoom(this.$refs.graph);
     });
   },
   beforeDestroy() {

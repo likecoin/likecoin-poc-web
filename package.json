@@ -17,6 +17,7 @@
     "ethjs-contract": "^0.1.9",
     "lodash.debounce": "^4.0.8",
     "moment": "^2.19.1",
+    "panzoom": "^3.0.0",
     "vue": "^2.5.2",
     "vue-intercom": "^1.0.6",
     "vue-material": "^0.7.5",
