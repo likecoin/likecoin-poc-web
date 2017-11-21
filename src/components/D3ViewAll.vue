@@ -1,5 +1,6 @@
 <template>
-  <svg :width="windowWidth" :height="renderRadius*2"
+  <div>
+  <svg :width="windowWidth" :height="windowHeight"
        @mousemove="drag($event)"
        @mouseup="drop()">
     <g>
@@ -23,11 +24,15 @@
           <title>{{ node.description }}</title>
           <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
            :xlink:href="'https://meme.like.community/ipfs/'+node.ipfs"
-            @mousedown="currentMove = {x: $event.screenX, y: $event.screenY, node: node.dNode}"
+            @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node: node.dNode, data: node})"
            :height="`${nodeSize}`" :width="`${nodeSize}`" :x="`${-nodeRadius}`" :y="`${-nodeRadius}`" /></a>
         </g>
     </g>
   </svg>
+    <md-snackbar md-duration="60000" ref="snackbar">
+      <span><a :href="'/#/view/'+currentData.url">{{ currentData.description || '(empty)' }}</a> by {{ currentData.author }}</span>
+    </md-snackbar>
+  </div>
 </template>
 
 <script>
@@ -49,12 +54,12 @@ export default {
         nodes: null,
         links: null,
       },
-      panzoom: null,
       windowWidth: 0,
       windowHeight: 0,
       nodeScale: 0.25,
       padding: 50,
       currentMove: null,
+      currentData: {},
     };
   },
   computed: {
@@ -77,6 +82,7 @@ export default {
           return {
             id: d.id,
             ipfs: d.data.ipfs,
+            author: d.data.author,
             description: d.data.description,
             url: d.id === 'root' ? '' : d.id,
             style: {
@@ -139,17 +145,24 @@ export default {
           .force('y', d3.forceY());
       }
     },
+    onMouseDown(e) {
+      this.currentMove = e;
+      if (this.currentMove.data !== this.currentData) {
+        this.currentData = this.currentMove.data;
+        if (!this.$refs.snackbar.active) {
+          this.$refs.snackbar.close();
+          this.$refs.snackbar.open();
+        }
+      }
+    },
     drag(e) {
       if (this.currentMove) {
-        console.log(e);
         this.currentMove.node.fx = this.currentMove.node.x -
          (((this.currentMove.x - e.screenX) * (this.bounds.maxX - this.bounds.minX))
           / (this.windowWidth - (2 * this.padding)));
         this.currentMove.node.fy = this.currentMove.node.y -
         (((this.currentMove.y - e.screenY) * (this.bounds.maxY - this.bounds.minY))
           / (this.windowHeight - (2 * this.padding)));
-        console.log(this.currentMove.node.fx);
-        console.log(this.currentMove.node.fy);
         this.currentMove.x = e.screenX;
         this.currentMove.y = e.screenY;
       }
@@ -159,9 +172,9 @@ export default {
         delete this.currentMove.node.fx;
         delete this.currentMove.node.fy;
         this.currentMove = null;
+        this.simulation.alpha(0.5);
+        this.simulation.restart();
       }
-      this.simulation.alpha(1);
-      this.simulation.restart();
     },
   },
   mounted() {
