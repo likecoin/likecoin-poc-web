@@ -78,6 +78,7 @@ export default {
           return {
             id: r.topics[1],
             ipfs: decode.ipfs,
+            author: decode.author,
             description: decode.description,
             isOriginal,
             parent: isOriginal ? '' : decode.footprintKeys[0],
