@@ -31,9 +31,10 @@
         </g></g>
     </g>
   </svg>
-    <md-snackbar md-duration="60000" ref="snackbar">
+    <md-snackbar v-if="currentData" md-duration="60000" ref="snackbar">
       <span><a :href="'/#/view/'+(currentData.id === 'root' ? '' : currentData.id)">
-      {{ currentData.description || '(empty)' }}</a> by {{ currentData.author }}</span>
+      {{ currentData.data ? currentData.data.description || '(empty)' : '(empty)'}}
+      </a> by {{ currentData.data ? currentData.data.author || '(_unknown)' : '(_unknown)'}}</span>
     </md-snackbar>
   </div>
 </template>
@@ -185,12 +186,21 @@ export default {
       this.setWindowWidth();
       this.setWindowHeight();
       // this.panzoom = panzoom(this.$refs.graph);
-      this.rerenderD3Tree();
+      if (this.list && this.list.length) this.rerenderD3Tree();
     });
   },
   beforeDestroy() {
     window.removeEventListener('resize', _debounce(this.setWindowWidth));
     window.removeEventListener('resize', _debounce(this.setWindowHeight));
+  },
+  watch: {
+    list(list) {
+      if (list && list.length) {
+        this.$nextTick(() => {
+          this.rerenderD3Tree();
+        });
+      }
+    },
   },
 };
 </script>
