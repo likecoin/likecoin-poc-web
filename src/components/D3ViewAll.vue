@@ -24,8 +24,8 @@
           <title>{{ node.data.description }}</title>
 <!--           <circle :r="`${nodeRadius}`"
             @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node: node })" /> -->
-          <image v-if="node.data.ipfs" :href="'https://meme.like.community/ipfs/'+node.data.ipfs" clip-path="url(#cicleClipPath)"
-           :xlink:href="'https://meme.like.community/ipfs/'+node.data.ipfs"
+          <image v-if="node.data.ipfs" :href="IPFS_HOST+'/thumb/'+node.data.ipfs" clip-path="url(#cicleClipPath)"
+           :xlink:href="IPFS_HOST+'/thumb/'+node.data.ipfs"
             @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node})"
            :height="`${nodeSize}`" :width="`${nodeSize}`" :x="`${-nodeRadius}`" :y="`${-nodeRadius}`" />
         </g></g>
@@ -41,8 +41,9 @@
 <script>
 import Vue from 'vue';
 import * as d3 from 'd3';
-// import * as panzoom from 'panzoom';
 import * as _debounce from 'lodash.debounce';
+
+import IPFS_HOST from '@/api/ipfsHost';
 
 export default {
   name: 'D3ViewAll',
@@ -63,6 +64,7 @@ export default {
       padding: 50,
       currentMove: null,
       currentData: {},
+      IPFS_HOST,
     };
   },
   computed: {
