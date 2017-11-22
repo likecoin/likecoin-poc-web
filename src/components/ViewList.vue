@@ -1,7 +1,7 @@
 <template>
   <div class="view">
     <md-layout md-gutter>
-      <md-tabs md-right class="md-transparent" @change="onTabChange">
+      <md-tabs v-if="!showGraphOnly" md-right class="md-transparent" @change="onTabChange">
         <md-tab md-label="Latest" />
         <md-tab md-label="Original" />
         <md-tab md-label="Meme" />
@@ -32,6 +32,9 @@ const LIST_SIZE = 16;
 
 export default {
   name: 'ViewList',
+  props: {
+    showGraphOnly: Boolean,
+  },
   data() {
     return {
       vList: [],
@@ -103,6 +106,7 @@ export default {
     const eventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' && obj.name === 'Uploaded'));
     const signature = abi.encodeEventSignature(eventObj);
     this.refreshList(eventObj, signature);
+    if (this.showGraphOnly) this.isGraph = true;
   },
 };
 </script>

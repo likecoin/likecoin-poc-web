@@ -29,6 +29,12 @@ export default new Router({
           name: 'ViewList',
           component: ViewList,
         },
+        {
+          path: '/all',
+          name: 'ViewList',
+          props: { showGraphOnly: true },
+          component: ViewList,
+        },
       ],
     },
     { path: '/view', redirect: { name: 'UploadImage' } },
