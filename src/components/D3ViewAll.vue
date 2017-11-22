@@ -14,23 +14,26 @@
         <stop offset="77%"   stop-color="#b792ff"/>
         <stop offset="100%" stop-color="#fe7ba0"/>
       </radialGradient>
-        <line v-for="link in graph.links" class="link"
+        <g><line v-for="link in graph.links" class="link"
           :x1="coords[link.source.index].x"
           :y1="coords[link.source.index].y"
           :x2="coords[link.target.index].x"
-          :y2="coords[link.target.index].y"></line>
-        <g class="node" v-for="(node, i) in renderNodes" v-bind:style="node.style" >
+          :y2="coords[link.target.index].y"></line></g>
+        <g><g class="node" v-for="(node, i) in graph.nodes" v-bind:style="getNodeStyle(node)">
           <!-- <a :href="'/#/view/'+node.url" :xlink:href="'/#/view/'+node.url"> -->
-          <title>{{ node.description }}</title>
-          <image v-if="node.ipfs" :href="'https://meme.like.community/ipfs/'+node.ipfs" clip-path="url(#cicleClipPath)"
-           :xlink:href="'https://meme.like.community/ipfs/'+node.ipfs"
-            @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node: node.dNode, data: node})"
-           :height="`${nodeSize}`" :width="`${nodeSize}`" :x="`${-nodeRadius}`" :y="`${-nodeRadius}`" /></a>
-        </g>
+          <title>{{ node.data.description }}</title>
+<!--           <circle :r="`${nodeRadius}`"
+            @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node: node })" /> -->
+          <image v-if="node.data.ipfs" :href="'https://meme.like.community/ipfs/'+node.data.ipfs" clip-path="url(#cicleClipPath)"
+           :xlink:href="'https://meme.like.community/ipfs/'+node.data.ipfs"
+            @mousedown="onMouseDown({x: $event.screenX, y: $event.screenY, node})"
+           :height="`${nodeSize}`" :width="`${nodeSize}`" :x="`${-nodeRadius}`" :y="`${-nodeRadius}`" />
+        </g></g>
     </g>
   </svg>
     <md-snackbar md-duration="60000" ref="snackbar">
-      <span><a :href="'/#/view/'+currentData.url">{{ currentData.description || '(empty)' }}</a> by {{ currentData.author }}</span>
+      <span><a :href="'/#/view/'+(currentData.id === 'root' ? '' : currentData.id)">
+      {{ currentData.description || '(empty)' }}</a> by {{ currentData.author }}</span>
     </md-snackbar>
   </div>
 </template>
@@ -75,25 +78,6 @@ export default {
     nodeRadius() {
       return this.nodeBase / 14;
     },
-    renderNodes() {
-      if (this.graph && this.graph.nodes) {
-        return this.graph.nodes.map((d) => {
-          const transform = `translate(${this.coords[d.index].x}px, ${this.coords[d.index].y}px)`;
-          return {
-            id: d.id,
-            ipfs: d.data.ipfs,
-            author: d.data.author,
-            description: d.data.description,
-            url: d.id === 'root' ? '' : d.id,
-            style: {
-              transform,
-            },
-            dNode: d,
-          };
-        });
-      }
-      return [];
-    },
     bounds() {
       return {
         minX: Math.min(...this.graph.nodes.map(n => n.x)),
@@ -103,18 +87,29 @@ export default {
       };
     },
     coords() {
+      const padding = (2 * this.padding) + this.nodeRadius;
+      const xScale = (this.windowWidth - padding) / (this.bounds.maxX - this.bounds.minX);
+      const yScale = (this.windowHeight - padding) / (this.bounds.maxY - this.bounds.minY);
       return this.graph.nodes.map((node) => {
-        const padding = 2 * this.padding;
-        return {
-          x: this.padding + (((node.x - this.bounds.minX)
-            * (this.windowWidth - padding)) / (this.bounds.maxX - this.bounds.minX)),
-          y: this.padding + (((node.y - this.bounds.minY)
-            * (this.windowHeight - padding)) / (this.bounds.maxY - this.bounds.minY)),
+        if (node.cord && node.vx === 0 && node.vy === 0
+          && !node.fx && !node.fy) {
+          return node.cord;
+        }
+        const cord = {
+          x: this.padding + ((node.x - this.bounds.minX) * xScale),
+          y: this.padding + ((node.y - this.bounds.minY) * yScale),
         };
+        // eslint-disable-next-line no-param-reassign
+        node.cord = cord;
+        return cord;
       });
     },
   },
   methods: {
+    getNodeStyle(d) {
+      return { transform: `translate(${parseInt(this.coords[d.index].x, 10)}px,
+        ${parseInt(this.coords[d.index].y, 10)}px)` };
+    },
     setWindowWidth() {
       this.windowWidth = document.documentElement.clientWidth;
     },
@@ -147,8 +142,8 @@ export default {
     },
     onMouseDown(e) {
       this.currentMove = e;
-      if (this.currentMove.data !== this.currentData) {
-        this.currentData = this.currentMove.data;
+      if (this.currentMove.node !== this.currentData) {
+        this.currentData = this.currentMove.node;
         if (!this.$refs.snackbar.active) {
           this.$refs.snackbar.close();
           this.$refs.snackbar.open();
