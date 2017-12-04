@@ -2,6 +2,9 @@
 
 > poc of likecoin project
 
+This is the frontend and submodule of [like-poc](https://github.com/likecoin/like-poc).
+
+
 ## Build Setup
 
 ``` bash
