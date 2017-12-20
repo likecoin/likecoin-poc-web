@@ -1,5 +1,6 @@
 /* global web3 */
 import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS } from '@/constant/contract/likemedia';
+import { LIKE_COIN_ABI, LIKE_COIN_ADDRESS } from '@/constant/contract/likecoin';
 
 const Eth = require('ethjs');
 const EthContract = require('ethjs-contract');
@@ -7,6 +8,8 @@ const EthContract = require('ethjs-contract');
 class EthHelper {
 
   initApp(errCb, clearErrCb) {
+    const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'));
+    this.startApp(eth);
     this.errCb = errCb;
     this.clearErrCb = clearErrCb;
     setTimeout(() => this.pollForWeb3(), 1000);
@@ -23,28 +26,26 @@ class EthHelper {
           const eth = new Eth(web3.currentProvider);
           this.clearErrCb();
           this.startApp(eth);
+          this.isMetaMask = true;
         } else {
           this.errCb('testnet');
           this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
         }
       });
     } else {
-      /* if use testrpc instead */
-      // const eth = new Eth(new Eth.HttpProvider('http://localhost:8545'));
-      // this.startApp(eth);
-      /* if no metamask, connect to rinkeby directly */
-      const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'));
-      this.startApp(eth);
-      // this.errCb('web3');
-      // this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
+      this.errCb('web3');
+      this.retryTimer = setTimeout(() => this.pollForWeb3(), 3000);
     }
   }
 
   startApp(eth) {
     this.eth = eth;
-    const contract = new EthContract(eth);
-    const LikeContract = contract(LIKE_MEDIA_ABI);
-    this.likeContract = LikeContract.at(LIKE_MEDIA_ADDRESS);
+    let contract = new EthContract(eth);
+    const LikeMediaContract = contract(LIKE_MEDIA_ABI);
+    this.likeMediaContract = LikeMediaContract.at(LIKE_MEDIA_ADDRESS);
+    contract = new EthContract(eth);
+    const LikeCoinContract = contract(LIKE_COIN_ABI);
+    this.likeCoinContract = LikeCoinContract.at(LIKE_COIN_ADDRESS);
     this.getAccounts(eth);
   }
 
@@ -77,12 +78,12 @@ class EthHelper {
   }
 
   onClick(format, pre, cb) {
-    if (!this.likeContract) return;
+    if (!this.likeMediaContract) return;
     const { id, author, wallet, description, license, footprints, ipfs } = format;
     const footprintsArray = JSON.parse(footprints);
     const footprintKeys = footprintsArray.map(f => f.id);
     const footprintValues = footprintsArray.map(f => f.share);
-    this.likeContract.upload(
+    this.likeMediaContract.upload(
       id,
       author,
       description,
@@ -103,8 +104,8 @@ class EthHelper {
   }
 
   onClickGet(uid) {
-    if (!this.likeContract) return;
-    this.likeContract.get(uid)
+    if (!this.likeMediaContract) return;
+    this.likeMediaContract.get(uid)
     .then((info) => {
       console.dir(info);
     })
@@ -114,5 +115,11 @@ class EthHelper {
   getWallet() {
     return this.wallet;
   }
+
+  queryLikeCoinBalance(addr) {
+    if (!addr) return '';
+    return this.likeCoinContract.balanceOf(addr);
+  }
+
 }
 export default new EthHelper();
