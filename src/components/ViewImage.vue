@@ -32,6 +32,10 @@
           <md-table-row  v-for="(value, key) in metadata" :key="key" v-if="!key.includes('footprint')">
             <md-table-cell>{{ key==='key'? 'Fingerprint': key }}</md-table-cell>
             <md-table-cell v-if="key==='timestamp'">{{ parseTimeStamp(value) }}</md-table-cell>
+            <md-table-cell v-else-if="key==='wallet'">
+              <a :href="'https://rinkeby.etherscan.io/address/'+value" target="_blank">{{ value }}</a>
+              <span v-if="likeCoinBalance"> | Likecoin: <a :href="'https://rinkeby.etherscan.io/address/'+value+'#tokentxns'" target="_blank"> {{ likeCoinBalance }} </a></span>
+            </md-table-cell>
             <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>
         </md-table-body>
@@ -68,12 +72,15 @@
 
 <script>
 import moment from 'moment';
+import BN from 'bn.js';
 
 import defaultImage from '@/assets/logo.png';
 import EthHelper from '@/util/EthHelper';
 import * as api from '@/api/api';
 import MdIpfsImage from './MdIpfsImage';
 import LikeForm from './LikeForm';
+
+const ONE_LIKE = new BN(10).pow(new BN(18));
 
 export default {
   name: 'ViewImage',
@@ -89,6 +96,7 @@ export default {
       isInTransaction: false,
       txHash: '',
       errorMsg: 'No error',
+      likeCoinBalance: undefined,
     };
   },
   components: {
@@ -119,9 +127,13 @@ export default {
           this.ipfsHash = result.data.ipfs;
           this.uid = uid;
           this.memeParentId = uid;
+          return EthHelper.queryLikeCoinBalance(this.metadata.wallet);
+        })
+        .then((balance) => {
+          this.likeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
         })
         .catch((err) => {
-          this.errorMsg = err.response.data;
+          this.errorMsg = err.message || err.response.data;
           this.$refs.dialog.open();
         });
       }
