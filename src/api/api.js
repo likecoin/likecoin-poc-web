@@ -14,6 +14,9 @@ export const apiPostUploadImage = (form) => {
 export const apiPostMeme = (uid, topText, text, metadata) =>
   axios.post(`${HOST}/meme/${uid}`, { topText, text, metadata });
 
+export const apiPostLike = (uid, payload) =>
+  axios.post(`${HOST}/like/${uid}`, payload);
+
 export const apiGetMetadata = uid => axios.get(`${HOST}/query/${uid}`);
 
 export const apiPostRinkeby = (id, data) =>

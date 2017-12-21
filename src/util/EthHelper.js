@@ -1,9 +1,11 @@
 /* global web3 */
+/* eslint-disable class-methods-use-this */
 import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS } from '@/constant/contract/likemedia';
 import { LIKE_COIN_ABI, LIKE_COIN_ADDRESS } from '@/constant/contract/likecoin';
 
 const Eth = require('ethjs');
 const EthContract = require('ethjs-contract');
+const randomhex = require('randomhex');
 
 class EthHelper {
 
@@ -120,6 +122,87 @@ class EthHelper {
     if (!addr) return '';
     return this.likeCoinContract.balanceOf(addr);
   }
+
+  /* copy and paste for now, clean up later */
+  prettifyNumber(n) {
+    const s = n.toString(10);
+    let start = 0;
+    let until = ((s.length + 2) % 3) + 1;
+    const arr = [];
+    while (start < s.length) {
+      arr.push(s.substr(start, until - start));
+      start = until;
+      until += 3;
+    }
+    return arr.join(' ');
+  }
+
+  async genTypedSignData(from, value) {
+    let nonce;
+    let result = true;
+    do {
+      nonce = randomhex(32);
+      result = (await this.likeCoinContract.usedNonce(from, nonce));
+    } while (result && result[0]);
+    return [
+      { type: 'address', name: 'contract', value: LIKE_COIN_ADDRESS },
+      { type: 'string', name: 'method', value: 'approveDelegated' },
+      { type: 'address', name: 'spender', value: LIKE_MEDIA_ADDRESS },
+      { type: 'uint256', name: 'value', value: this.prettifyNumber(value) },
+      { type: 'uint256', name: 'nonce', value: nonce },
+    ];
+  }
+
+  sendAsync(obj) {
+    return new Promise((resolve, reject) => {
+      web3.currentProvider.sendAsync(obj, (err, result) => {
+        if (err) {
+          reject(err);
+        } else if (result.error) {
+          reject(result.error);
+        } else {
+          resolve(result.result || result);
+        }
+      });
+    });
+  }
+
+  async signTyped(signData, from) {
+    try {
+      const result = await this.sendAsync({
+        method: 'eth_signTypedData',
+        params: [signData, from],
+        from,
+      });
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
+    return '';
+  }
+
+  async signTransferDelegated(key, value) {
+    const from = this.getWallet();
+    const signData = (await this.genTypedSignData(from, value));
+    console.log(signData);
+    const nonce = signData.filter(param => param.name === 'nonce')[0].value;
+    const rawSignature = (await this.signTyped(signData, from)).substr(2);
+    console.log(`rawSignature = ${rawSignature}`);
+    const r = `0x${rawSignature.substr(0, 64)}`;
+    const s = `0x${rawSignature.substr(64, 64)}`;
+    const v = Number.parseInt(rawSignature.substr(128, 2), 16);
+    const postData = {
+      key,
+      from,
+      value: value.toString(10),
+      nonce,
+      r,
+      s,
+      v,
+    };
+    return Promise.resolve(postData);
+  }
+  /* copy and paste end */
 
 }
 export default new EthHelper();

@@ -56,7 +56,10 @@
         </md-table-body>
       </md-table>
     </div>
-    <span><md-button class="md-primary md-raised" v-if="uid && !isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
+    <span v-if="uid && !isMemeing">
+      <md-button class="md-primary md-raised" @click="OnLike"> Like </md-button>
+      <md-button class="md-primary md-raised" @click="isMemeing=true"> MEME! </md-button>
+    </span>
     </md-layout>
     </md-layout>
     <md-snackbar md-duration="60000" ref="snackbar">
@@ -177,6 +180,10 @@ export default {
     },
     onPreview(data) {
       this.imageData = data;
+    },
+    OnLike() {
+      EthHelper.signTransferDelegated(this.uid, ONE_LIKE)
+      .then(payload => api.apiPostLike(this.uid, payload));
     },
   },
   mounted() {
