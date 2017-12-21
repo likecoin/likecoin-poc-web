@@ -14,6 +14,9 @@ export const apiPostUploadImage = (form) => {
 export const apiPostMeme = (uid, topText, text, metadata) =>
   axios.post(`${HOST}/meme/${uid}`, { topText, text, metadata });
 
+export const apiGrantLike = addr =>
+  axios.post(`${HOST}/faucet/${addr}`);
+
 export const apiPostLike = (uid, payload) =>
   axios.post(`${HOST}/like/${uid}`, payload);
 
