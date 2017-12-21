@@ -209,6 +209,7 @@ export default {
     },
     OnGrant() {
       if (!this.wallet) return;
+      this.loading = true;
       api.apiGrantLike(this.wallet)
       .then(result => this.loadingCB(result))
       .catch((err) => {
@@ -217,8 +218,11 @@ export default {
       });
     },
     OnLike() {
-      EthHelper.signTransferDelegated(this.uid, ONE_LIKE)
-      .then(payload => api.apiPostLike(this.uid, payload))
+      EthHelper.signTransferDelegated(this.uid, ONE_LIKE.mul(new BN(100)))
+      .then((payload) => {
+        this.loading = true;
+        return api.apiPostLike(this.uid, payload);
+      })
       .then(result => this.loadingCB(result))
       .catch((err) => {
         this.errorMsg = err.response.data;
