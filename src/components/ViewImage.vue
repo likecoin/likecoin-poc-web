@@ -32,6 +32,10 @@
           <md-table-row  v-for="(value, key) in metadata" :key="key" v-if="!key.includes('footprint')">
             <md-table-cell>{{ key==='key'? 'Fingerprint': key }}</md-table-cell>
             <md-table-cell v-if="key==='timestamp'">{{ parseTimeStamp(value) }}</md-table-cell>
+            <md-table-cell v-else-if="key==='wallet'">
+              <a :href="'https://rinkeby.etherscan.io/address/'+value" target="_blank">{{ value }}</a>
+              <span v-if="authorLikeCoinBalance"> | Likecoin: <a :href="'https://rinkeby.etherscan.io/address/'+value+'#tokentxns'" target="_blank"> {{ authorLikeCoinBalance }} </a></span>
+            </md-table-cell>
             <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>
         </md-table-body>
@@ -52,7 +56,21 @@
         </md-table-body>
       </md-table>
     </div>
-    <span><md-button class="md-primary md-raised" v-if="uid && !isMemeing" @click="isMemeing=true"> MEME! </md-button></span>
+    <span v-if="uid && !isMemeing">
+      <md-button class="md-raised" v-if="(wallet && mylikeCoinBalance === '0')" @click="OnGrant">
+        Get Likecoin
+        <md-tooltip md-direction="bottom">You don't have any like coin, click to get some!</md-tooltip>
+      </md-button>
+      <md-button class='md-accent md-raised' :disabled="(wallet && mylikeCoinBalance === '0')" @click="OnLike">
+        Like
+        <md-tooltip md-direction="bottom" v-if="wallet">
+          You have
+           <a :href="'https://rinkeby.etherscan.io/address/'+wallet+'#tokentxns'" target="_blank">{{ mylikeCoinBalance }}</a>
+           Likecoin!
+         </md-tooltip>
+      </md-button>
+      <md-button class="md-primary md-raised" @click="isMemeing=true"> MEME! </md-button>
+    </span>
     </md-layout>
     </md-layout>
     <md-snackbar md-duration="60000" ref="snackbar">
@@ -68,6 +86,7 @@
 
 <script>
 import moment from 'moment';
+import BN from 'bn.js';
 
 import defaultImage from '@/assets/logo.png';
 import EthHelper from '@/util/EthHelper';
@@ -75,11 +94,14 @@ import * as api from '@/api/api';
 import MdIpfsImage from './MdIpfsImage';
 import LikeForm from './LikeForm';
 
+const ONE_LIKE = new BN(10).pow(new BN(18));
+
 export default {
   name: 'ViewImage',
   data() {
     return {
       uid: '',
+      wallet: '',
       imageData: defaultImage,
       ipfsHash: '',
       metadata: {},
@@ -89,6 +111,8 @@ export default {
       isInTransaction: false,
       txHash: '',
       errorMsg: 'No error',
+      mylikeCoinBalance: undefined,
+      authorLikeCoinBalance: undefined,
     };
   },
   components: {
@@ -119,9 +143,13 @@ export default {
           this.ipfsHash = result.data.ipfs;
           this.uid = uid;
           this.memeParentId = uid;
+          return EthHelper.queryLikeCoinBalance(this.metadata.wallet);
+        })
+        .then((balance) => {
+          this.authorLikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
         })
         .catch((err) => {
-          this.errorMsg = err.response.data;
+          this.errorMsg = err.message || err.response.data;
           this.$refs.dialog.open();
         });
       }
@@ -129,6 +157,36 @@ export default {
     parseTimeStamp(hex) {
       const t = new Date(parseInt(hex, 16) * 1000);
       return moment(t).format('YYYY-MM-DD HH:mm:ss');
+    },
+    setMyLikeCoin(wallet) {
+      this.wallet = wallet;
+      EthHelper.queryLikeCoinBalance(this.wallet)
+      .then((balance) => {
+        this.mylikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+      });
+    },
+    loadingCB(result) {
+      this.$refs.snackbar.open();
+      this.isInTransaction = true;
+      if (!result || !result.data || !result.data.txHash) return;
+      this.txHash = result.data.txHash;
+      EthHelper.waitForTxToBeMined(
+        result.data.txHash,
+        (err) => {
+          this.loading = false;
+          this.isInTransaction = false;
+          this.$refs.snackbar.close();
+          if (err) return;
+          setTimeout(() => {
+            if (result.data.id) {
+              this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
+              if (this.isMemeing) location.reload(); // refresh for better UX
+            } else {
+              location.reload();
+            }
+          }, 1000); // wait 1 second try to avoid strange stream issue
+        },
+      );
     },
     onSubmit(data) {
       this.loading = true;
@@ -140,24 +198,7 @@ export default {
         targetApi = api.apiPostUploadImage(data.metadata);
       }
       targetApi
-      .then((result) => {
-        this.$refs.snackbar.open();
-        this.isInTransaction = true;
-        this.txHash = result.data.txHash;
-        EthHelper.waitForTxToBeMined(
-          result.data.txHash,
-          (err) => {
-            this.loading = false;
-            this.isInTransaction = false;
-            this.$refs.snackbar.close();
-            if (err) return;
-            setTimeout(() => {
-              this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
-              if (this.isMemeing) location.reload(); // refresh for better UX
-            }, 1000); // wait 1 second try to avoid strange stream issue
-          },
-        );
-      })
+      .then(result => this.loadingCB(result))
       .catch((err) => {
         this.errorMsg = err.response.data;
         this.$refs.dialog.open();
@@ -166,18 +207,45 @@ export default {
     onPreview(data) {
       this.imageData = data;
     },
+    OnGrant() {
+      if (!this.wallet) return;
+      this.loading = true;
+      api.apiGrantLike(this.wallet)
+      .then(result => this.loadingCB(result))
+      .catch((err) => {
+        this.errorMsg = err.response.data;
+        this.$refs.dialog.open();
+      });
+    },
+    OnLike() {
+      EthHelper.signTransferDelegated(this.uid, ONE_LIKE.mul(new BN(100)))
+      .then((payload) => {
+        this.loading = true;
+        return api.apiPostLike(this.uid, payload);
+      })
+      .then(result => this.loadingCB(result))
+      .catch((err) => {
+        this.errorMsg = err.response.data;
+        this.$refs.dialog.open();
+      });
+    },
   },
   mounted() {
     this.uid = this.$route.params.uid || '';
     if (this.uid) {
       this.refreshImage(this.uid);
     }
-    setTimeout(() => {
-      const localWallet = EthHelper.getWallet();
-      if (localWallet) {
-        this.wallet = localWallet;
-      }
-    }, 2000);
+    let localWallet = EthHelper.getWallet();
+    if (localWallet) {
+      this.setMyLikeCoin(localWallet);
+    } else {
+      setTimeout(() => {
+        localWallet = EthHelper.getWallet();
+        if (localWallet) {
+          this.setMyLikeCoin(localWallet);
+        }
+      }, 2000);
+    }
   },
   beforeRouteUpdate(to, from, next) {
     this.uid = to.params.uid || '';
