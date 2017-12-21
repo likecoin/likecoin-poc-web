@@ -7,6 +7,10 @@ const Eth = require('ethjs');
 const EthContract = require('ethjs-contract');
 const randomhex = require('randomhex');
 
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class EthHelper {
 
   initApp(errCb, clearErrCb) {
@@ -69,6 +73,7 @@ class EthHelper {
     while (!txReceipt) {
       try {
         /* eslint-disable no-await-in-loop */
+        await timeout(1000);
         txReceipt = await this.eth.getTransactionReceipt(txHash);
       } catch (err) {
         console.log(`ERROR: ${err}`);
@@ -184,10 +189,8 @@ class EthHelper {
   async signTransferDelegated(key, value) {
     const from = this.getWallet();
     const signData = (await this.genTypedSignData(from, value));
-    console.log(signData);
     const nonce = signData.filter(param => param.name === 'nonce')[0].value;
     const rawSignature = (await this.signTyped(signData, from)).substr(2);
-    console.log(`rawSignature = ${rawSignature}`);
     const r = `0x${rawSignature.substr(0, 64)}`;
     const s = `0x${rawSignature.substr(64, 64)}`;
     const v = Number.parseInt(rawSignature.substr(128, 2), 16);

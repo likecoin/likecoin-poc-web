@@ -60,8 +60,7 @@ export default {
       (err) => {
         if (err === 'web3') this.errMsg = this.web3Error;
         else if (err === 'testnet') this.errMsg = this.testnetError;
-        // Do not show locked error as it is not necessary
-        // else if (err === 'locked') this.errMsg = this.lockedError;
+        else if (err === 'locked') this.errMsg = this.lockedError;
       },
       () => {
         this.errMsg = '';

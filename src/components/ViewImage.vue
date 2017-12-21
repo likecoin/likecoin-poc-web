@@ -218,7 +218,7 @@ export default {
       });
     },
     OnLike() {
-      EthHelper.signTransferDelegated(this.uid, ONE_LIKE.mul(new BN(100)))
+      EthHelper.signTransferDelegated(this.uid, ONE_LIKE.mul(new BN(1)))
       .then((payload) => {
         this.loading = true;
         return api.apiPostLike(this.uid, payload);
