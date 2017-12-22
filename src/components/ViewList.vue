@@ -3,6 +3,7 @@
     <md-layout md-gutter>
       <md-tabs v-if="!showGraphOnly" md-right class="md-transparent" @change="onTabChange">
         <md-tab md-label="Latest" />
+        <md-tab md-label="Most Liked" />
         <md-tab md-label="Original" />
         <md-tab md-label="Meme" />
         <md-tab md-label="ALL" />
@@ -40,6 +41,7 @@ export default {
       vList: [],
       isGraph: false,
       completeList: [],
+      sortedLikedList: [],
     };
   },
   components: {
@@ -59,9 +61,17 @@ export default {
       const list = this.completeList.filter(v => !v.isOriginal);
       return list.slice(list.length - LIST_SIZE, list.length).reverse();
     },
+    mostLikedList() {
+      return this.sortedLikedList.slice(0, LIST_SIZE);
+    },
   },
   methods: {
-    refreshList(eventObj, signature) {
+    refreshList() {
+      const uploadEventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' && obj.name === 'Uploaded'));
+      const uploadSignature = abi.encodeEventSignature(uploadEventObj);
+      const giveLikeEventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' &&
+        obj.name === 'GiveLike'));
+      const giveLikeSignature = abi.encodeEventSignature(giveLikeEventObj);
       const data = {
         jsonrpc: '2.0',
         method: 'eth_getLogs',
@@ -69,26 +79,40 @@ export default {
           fromBlock: '0x1',
           toBlock: 'latest',
           address: LIKE_MEDIA_ADDRESS,
-          topics: [`${signature}`],
+          topics: [[`${giveLikeSignature}`, `${uploadSignature}`]],
         }],
         id: Math.floor(Math.random() * 100000) + 10,
       };
       api.apiPostRinkeby(RINKEBY_ID, data).then((response) => {
         // get body data
-        const decodeList = response.data.result.map((r) => {
-          const decode = abi.decodeLog(eventObj.inputs, r.data, r.topics);
+        const decodeList = [];
+        const likeCounts = {};
+        response.data.result.map((r) => {
+          // like counts
+          if (r.topics.includes(giveLikeSignature)) {
+            likeCounts[r.topics[1]] = likeCounts[r.topics[1]] ?
+              likeCounts[r.topics[1]] + 1 : 1;
+            return 0;
+          }
+
+          // get upload list
+          const decode = abi.decodeLog(uploadEventObj.inputs, r.data, r.topics);
           const isOriginal = !(decode.footprintKeys && decode.footprintKeys.length > 0);
-          return {
-            id: r.topics[1],
-            ipfs: decode.ipfs,
-            author: decode.author,
-            description: decode.description,
-            isOriginal,
-            parent: isOriginal ? '' : decode.footprintKeys[0],
-          };
+          decodeList.push(
+            {
+              id: r.topics[1],
+              ipfs: decode.ipfs,
+              author: decode.author,
+              description: decode.description,
+              isOriginal,
+              parent: isOriginal ? '' : decode.footprintKeys[0],
+            });
+          return 0;
         });
         this.completeList = decodeList; // .slice(decodeList.length - 100, decodeList.length);
         this.vList = this.newList;
+        this.sortedLikedList = decodeList.slice(0);
+        this.sortedLikedList.sort((a, b) => likeCounts[b.id] - likeCounts[a.id]);
       })
       .catch((response) => {
         // error callback
@@ -96,16 +120,15 @@ export default {
       });
     },
     onTabChange(index) {
-      this.isGraph = (index === 3);
+      this.isGraph = (index === 4);
       if (index === 0) this.vList = this.newList;
-      else if (index === 1) this.vList = this.originalList;
-      else if (index === 2) this.vList = this.memeList;
+      else if (index === 1) this.vList = this.mostLikedList;
+      else if (index === 2) this.vList = this.originalList;
+      else if (index === 3) this.vList = this.memeList;
     },
   },
   mounted() {
-    const eventObj = LIKE_MEDIA_ABI.find(obj => (obj.type === 'event' && obj.name === 'Uploaded'));
-    const signature = abi.encodeEventSignature(eventObj);
-    this.refreshList(eventObj, signature);
+    this.refreshList();
     if (this.showGraphOnly) this.isGraph = true;
   },
 };
