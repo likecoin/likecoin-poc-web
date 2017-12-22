@@ -38,7 +38,9 @@
             </md-table-cell>
             <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>
-          <md-table-row><md-table-cell>Number of Likes:</md-table-cell><md-table-cell>{{ likeCount }}</md-table-cell></md-table-row>
+          <md-table-row v-if="likeCount">
+            <md-table-cell>Number of Likes:</md-table-cell><md-table-cell>{{ likeCount }}</md-table-cell>
+          </md-table-row>
         </md-table-body>
       </md-table>
       <hr />
@@ -136,6 +138,24 @@ export default {
     },
   },
   methods: {
+    refreshLike() {
+      Promise.all([
+        EthHelper.queryLikeCoinBalance(this.wallet)
+        .then((balance) => {
+          this.mylikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+        }),
+        EthHelper.queryLikeCount(this.uid)
+        .then((count) => { this.likeCount = count[0].toString(10); }),
+        EthHelper.queryLikeCoinBalance(this.metadata.wallet)
+        .then((balance) => {
+          this.authorLikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+        }),
+      ])
+      .catch((err) => {
+        this.errorMsg = err.message || err.response.data;
+        this.$refs.dialog.open();
+      });
+    },
     refreshImage(newUid) {
       const uid = newUid;
       if (!this.ipfsHash || this.uid !== uid) {
@@ -145,6 +165,8 @@ export default {
           this.ipfsHash = result.data.ipfs;
           this.uid = uid;
           this.memeParentId = uid;
+          EthHelper.queryLikeCount(uid)
+          .then((count) => { this.likeCount = count[0].toString(10); });
           return EthHelper.queryLikeCoinBalance(this.metadata.wallet);
         })
         .then((balance) => {
@@ -155,12 +177,6 @@ export default {
           this.$refs.dialog.open();
         });
       }
-      EthHelper.queryLikeCount(uid)
-      .then((count) => { this.likeCount = count[0].toString(10); })
-      .catch((err) => {
-        this.errorMsg = err.message || err.response.data;
-        this.$refs.dialog.open();
-      });
     },
     parseTimeStamp(hex) {
       const t = new Date(parseInt(hex, 16) * 1000);
@@ -187,10 +203,12 @@ export default {
           if (err) return;
           setTimeout(() => {
             if (result.data.id) {
+              // after upload/meme
               this.$router.push({ name: 'ViewImage', params: { uid: result.data.id } });
               if (this.isMemeing) location.reload(); // refresh for better UX
             } else {
-              location.reload();
+              // after like
+              this.refreshLike();
             }
           }, 1000); // wait 1 second try to avoid strange stream issue
         },
