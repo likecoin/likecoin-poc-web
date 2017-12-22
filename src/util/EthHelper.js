@@ -62,7 +62,7 @@ class EthHelper {
         this.wallet = accounts[0];
         this.clearErrCb();
       } else {
-        this.errCb('locked');
+        if (this.isMetaMask) this.errCb('locked');
         this.retryTimer = setTimeout(() => this.getAccounts(eth), 3000);
       }
     });
@@ -128,6 +128,11 @@ class EthHelper {
     return this.likeCoinContract.balanceOf(addr);
   }
 
+  queryLikeCount(key) {
+    if (!key) return '0';
+    return this.likeMediaContract.getLike(key);
+  }
+
   /* copy and paste for now, clean up later */
   prettifyNumber(n) {
     const s = n.toString(10);
@@ -187,6 +192,7 @@ class EthHelper {
   }
 
   async signTransferDelegated(key, value) {
+    if (!this.isMetaMask) return Promise.reject(new Error('No MetaMask'));
     const from = this.getWallet();
     const signData = (await this.genTypedSignData(from, value));
     const nonce = signData.filter(param => param.name === 'nonce')[0].value;
