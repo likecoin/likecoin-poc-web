@@ -38,6 +38,7 @@
             </md-table-cell>
             <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>
+          <md-table-row><md-table-cell>Number of Likes:</md-table-cell><md-table-cell>{{ likeCount }}</md-table-cell></md-table-row>
         </md-table-body>
       </md-table>
       <hr />
@@ -57,11 +58,11 @@
       </md-table>
     </div>
     <span v-if="uid && !isMemeing">
-      <md-button class="md-raised" v-if="(wallet && mylikeCoinBalance === '0')" @click="OnGrant">
+      <md-button class="md-raised" v-if="(wallet && mylikeCoinBalance === '0')" :disable="loading" @click="OnGrant">
         Get Likecoin
         <md-tooltip md-direction="bottom">You don't have any like coin, click to get some!</md-tooltip>
       </md-button>
-      <md-button class='md-accent md-raised' :disabled="(wallet && mylikeCoinBalance === '0')" @click="OnLike">
+      <md-button class='md-accent md-raised' :disabled="loading || (wallet && mylikeCoinBalance === '0')" @click="OnLike">
         Like
         <md-tooltip md-direction="bottom" v-if="wallet">
           You have
@@ -104,6 +105,7 @@ export default {
       wallet: '',
       imageData: defaultImage,
       ipfsHash: '',
+      likeCount: '',
       metadata: {},
       memeParentId: '',
       isMemeing: false,
@@ -153,6 +155,12 @@ export default {
           this.$refs.dialog.open();
         });
       }
+      EthHelper.queryLikeCount(uid)
+      .then((count) => { this.likeCount = count[0].toString(10); })
+      .catch((err) => {
+        this.errorMsg = err.message || err.response.data;
+        this.$refs.dialog.open();
+      });
     },
     parseTimeStamp(hex) {
       const t = new Date(parseInt(hex, 16) * 1000);

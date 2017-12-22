@@ -128,6 +128,11 @@ class EthHelper {
     return this.likeCoinContract.balanceOf(addr);
   }
 
+  queryLikeCount(key) {
+    if (!key) return '0';
+    return this.likeMediaContract.getLike(key);
+  }
+
   /* copy and paste for now, clean up later */
   prettifyNumber(n) {
     const s = n.toString(10);
