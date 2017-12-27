@@ -197,6 +197,7 @@ class EthHelper {
     const signData = (await this.genTypedSignData(from, value));
     const nonce = signData.filter(param => param.name === 'nonce')[0].value;
     const rawSignature = (await this.signTyped(signData, from)).substr(2);
+    if (!rawSignature) return Promise.reject(new Error('Signing Rejected'));
     const r = `0x${rawSignature.substr(0, 64)}`;
     const s = `0x${rawSignature.substr(64, 64)}`;
     const v = Number.parseInt(rawSignature.substr(128, 2), 16);

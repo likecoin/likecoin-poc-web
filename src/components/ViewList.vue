@@ -51,15 +51,18 @@ export default {
   computed: {
     newList() {
       const decodeList = this.completeList;
-      return decodeList.slice(decodeList.length - LIST_SIZE, decodeList.length).reverse();
+      const begin = Math.max(decodeList.length - LIST_SIZE, 0);
+      return decodeList.slice(begin, decodeList.length).reverse();
     },
     originalList() {
       const list = this.completeList.filter(v => v.isOriginal);
-      return list.slice(list.length - LIST_SIZE, list.length).reverse();
+      const begin = Math.max(list.length - LIST_SIZE, 0);
+      return list.slice(begin, list.length).reverse();
     },
     memeList() {
       const list = this.completeList.filter(v => !v.isOriginal);
-      return list.slice(list.length - LIST_SIZE, list.length).reverse();
+      const begin = Math.max(list.length - LIST_SIZE, 0);
+      return list.slice(begin, list.length).reverse();
     },
     mostLikedList() {
       return this.sortedLikedList.slice(0, LIST_SIZE);
