@@ -226,7 +226,7 @@ export default {
       targetApi
       .then(result => this.loadingCB(result))
       .catch((err) => {
-        this.errorMsg = err.response.data;
+        this.errorMsg = err.message || err.response.data;
         this.$refs.dialog.open();
       });
     },
@@ -239,7 +239,7 @@ export default {
       api.apiGrantLike(this.wallet)
       .then(result => this.loadingCB(result))
       .catch((err) => {
-        this.errorMsg = err.response.data;
+        this.errorMsg = err.message || err.response.data;
         this.$refs.dialog.open();
       });
     },
@@ -251,7 +251,7 @@ export default {
       })
       .then(result => this.loadingCB(result))
       .catch((err) => {
-        this.errorMsg = err.response.data;
+        this.errorMsg = err.message || err.response.data;
         this.$refs.dialog.open();
       });
     },
