@@ -43,7 +43,7 @@ export default {
       errMsg: '',
       web3Error: 'Like function will not work without a wallet, is &nbsp;<a href="https://metamask.io/"> Metamask </a>&nbsp; installed?',
       testnetError: 'You are in wrong ETH network, please switch to testnet '
-      + ' &nbsp;<a href="https://www.rinkeby.io/"> Rinkeby </a>&nbsp; in metamask.',
+      + ' &nbsp;<a style="color:#EBB33F" href="https://www.rinkeby.io/"> Rinkeby </a>&nbsp; in metamask.',
       lockedError: 'Cannot obtain your ETH wallet, please make sure it is UNLOCKED.',
     };
   },
