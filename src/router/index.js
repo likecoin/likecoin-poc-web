@@ -31,7 +31,7 @@ export default new Router({
         },
         {
           path: '/all',
-          name: 'ViewList',
+          name: 'ViewAll',
           props: { showGraphOnly: true },
           component: ViewList,
         },

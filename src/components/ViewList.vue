@@ -2,11 +2,11 @@
   <div class="view">
     <md-layout md-gutter>
       <md-tabs v-if="!showGraphOnly" md-right class="md-transparent" @change="onTabChange">
-        <md-tab md-label="Latest" />
-        <md-tab md-label="Most Liked" />
-        <md-tab md-label="Original" />
-        <md-tab md-label="Meme" />
-        <md-tab md-label="ALL" />
+        <md-tab :md-active="!activeTab" md-label="Latest" />
+        <md-tab :md-active="activeTab=='1'" md-label="Most Liked" />
+        <md-tab :md-active="activeTab=='2'" md-label="Original" />
+        <md-tab :md-active="activeTab=='3'" md-label="Meme" />
+        <md-tab :md-active="activeTab=='4'" md-label="ALL" />
       </md-tabs>
       <md-layout v-if="!isGraph">
         <md-layout md-align="center" md-flex-xsmall="100" md-flex-small="50" md-flex-medium="33" md-flex="25"
@@ -38,6 +38,7 @@ export default {
   },
   data() {
     return {
+      activeTab: this.$route.query.c,
       vList: [],
       isGraph: false,
       completeList: [],
@@ -128,6 +129,7 @@ export default {
       else if (index === 1) this.vList = this.mostLikedList;
       else if (index === 2) this.vList = this.originalList;
       else if (index === 3) this.vList = this.memeList;
+      this.$router.replace({ name: 'ViewList', query: { c: index } });
     },
   },
   mounted() {
