@@ -34,7 +34,7 @@
             <md-table-cell v-if="key==='timestamp'">{{ parseTimeStamp(value) }}</md-table-cell>
             <md-table-cell v-else-if="key==='wallet'">
               <a :href="'https://rinkeby.etherscan.io/address/'+value" target="_blank">{{ value }}</a>
-              <span v-if="authorLikeCoinBalance"> | Likecoin: <a :href="'https://rinkeby.etherscan.io/address/'+value+'#tokentxns'" target="_blank"> {{ authorLikeCoinBalance }} </a></span>
+              <span v-if="authorLikeCoinBalance"> | LikeCoin: <a :href="'https://rinkeby.etherscan.io/address/'+value+'#tokentxns'" target="_blank"> {{ authorLikeCoinBalance }} </a></span>
             </md-table-cell>
             <md-table-cell v-else>{{ value }}</md-table-cell>
           </md-table-row>

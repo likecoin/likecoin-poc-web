@@ -65,6 +65,8 @@
 <script>
 import EthHelper from '@/util/EthHelper';
 
+const DEFAULT_WALLET = '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699';
+
 export default {
   name: 'LikeFrom',
   props: {
@@ -79,7 +81,7 @@ export default {
       imageFile: null,
       image: null,
       author: '',
-      wallet: EthHelper.getWallet() || '0x81f9b6c7129cee90fed5df241fa6dc4f88a19699',
+      wallet: DEFAULT_WALLET,
       description: '',
       license: 'cc',
       footprintShare: 50,
@@ -136,6 +138,20 @@ export default {
     onCancel() {
       this.$emit('Cancel');
     },
+  },
+  mounted() {
+    let localWallet = EthHelper.getWallet();
+    if (localWallet) {
+      this.wallet = localWallet;
+    } else {
+      setTimeout(() => {
+        if (this.wallet !== DEFAULT_WALLET) return;
+        localWallet = EthHelper.getWallet();
+        if (localWallet) {
+          this.wallet = localWallet;
+        }
+      }, 2000);
+    }
   },
 };
 
