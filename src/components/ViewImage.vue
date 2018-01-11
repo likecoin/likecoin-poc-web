@@ -1,6 +1,14 @@
 <template>
   <div class="view">
     <md-progress v-if="loading" :class="isInTransaction?'md-accent':''" md-indeterminate></md-progress>
+    <md-tabs md-right class="md-transparent" @change="onTabChange">
+      <md-tab md-label="VIEW" />
+      <md-tab md-label="Latest" />
+      <md-tab md-label="Most Liked" /><!--
+      <md-tab md-label="Original" />
+      <md-tab md-label="Meme" /> -->
+      <md-tab md-label="ALL" />
+    </md-tabs>
     <md-layout md-gutter>
     <md-layout md-align="center" md-column
       md-flex-medium="100"
@@ -254,6 +262,12 @@ export default {
         this.errorMsg = err.message || err.response.data;
         this.$refs.dialog.open();
       });
+    },
+    onTabChange(index) {
+      if (index > 0) {
+        const c = index - 1;
+        this.$router.push({ name: 'ViewList', query: { c } });
+      }
     },
   },
   mounted() {
