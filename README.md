@@ -1,5 +1,7 @@
 # like-poc-client
 
+[![NSP Status](https://nodesecurity.io/orgs/likecoin/projects/36fde657-29fd-4e67-bbc1-0a6a938da859/badge)](https://nodesecurity.io/orgs/likecoin/projects/36fde657-29fd-4e67-bbc1-0a6a938da859)
+
 > poc of likecoin project
 
 This is the frontend and submodule of [like-poc](https://github.com/likecoin/like-poc).
