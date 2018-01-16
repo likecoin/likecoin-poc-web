@@ -106,6 +106,12 @@ import MdIpfsImage from './MdIpfsImage';
 import LikeForm from './LikeForm';
 
 const ONE_LIKE = new BN(10).pow(new BN(18));
+const POINT_O_ONE_LIKE = new BN(10).pow(new BN(16));
+
+function prettifyLikeCoinBalance(balance) {
+  const amount = balance.balance.div(POINT_O_ONE_LIKE).toString(10);
+  return `${amount.slice(0, Math.max(0, amount.length - 2))}.${amount.slice(-2)}`;
+}
 
 export default {
   name: 'ViewImage',
@@ -150,13 +156,13 @@ export default {
       Promise.all([
         EthHelper.queryLikeCoinBalance(this.wallet)
         .then((balance) => {
-          this.mylikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+          this.mylikeCoinBalance = prettifyLikeCoinBalance(balance);
         }),
         EthHelper.queryLikeCount(this.uid)
         .then((count) => { this.likeCount = count[0].toString(10); }),
         EthHelper.queryLikeCoinBalance(this.metadata.wallet)
         .then((balance) => {
-          this.authorLikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+          this.authorLikeCoinBalance = prettifyLikeCoinBalance(balance);
         }),
       ])
       .catch((err) => {
@@ -178,7 +184,7 @@ export default {
           return EthHelper.queryLikeCoinBalance(this.metadata.wallet);
         })
         .then((balance) => {
-          this.authorLikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+          this.authorLikeCoinBalance = prettifyLikeCoinBalance(balance);
         })
         .catch((err) => {
           this.errorMsg = err.message || err.response.data;
@@ -194,7 +200,7 @@ export default {
       this.wallet = wallet;
       EthHelper.queryLikeCoinBalance(this.wallet)
       .then((balance) => {
-        this.mylikeCoinBalance = balance.balance.div(ONE_LIKE).toString(10);
+        this.mylikeCoinBalance = prettifyLikeCoinBalance(balance);
       });
     },
     loadingCB(result) {
