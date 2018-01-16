@@ -17,7 +17,7 @@
     "ethjs": "^0.2.8",
     "ethjs-contract": "^0.1.9",
     "lodash.debounce": "^4.0.8",
-    "moment": "^2.19.1",
+    "moment": "^2.19.3",
     "panzoom": "^3.0.0",
     "randomhex": "^0.1.5",
     "vue": "^2.5.2",
@@ -25,7 +25,7 @@
     "vue-material": "^0.7.5",
     "vue-meta": "^1.2.0",
     "vue-router": "^3.0.1",
-    "web3-eth-abi": "^1.0.0-beta.24"
+    "web3-eth-abi": "^1.0.0-beta.27"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
