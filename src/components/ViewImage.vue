@@ -68,11 +68,11 @@
       </md-table>
     </div>
     <span v-if="uid && !isMemeing">
-      <md-button class="md-raised" v-if="(wallet && mylikeCoinBalance === '0')" :disable="loading" @click="OnGrant">
+      <md-button class="md-raised" v-if="(wallet && (parseInt(mylikeCoinBalance, 10) === 0))" :disable="loading" @click="OnGrant">
         Get Likecoin
         <md-tooltip md-direction="bottom">You don't have any like coin, click to get some!</md-tooltip>
       </md-button>
-      <md-button class='md-accent md-raised' :disabled="loading || (wallet && mylikeCoinBalance === '0')" @click="OnLike">
+      <md-button class='md-accent md-raised' :disabled="loading || (wallet && (parseInt(mylikeCoinBalance, 10) === 0))" @click="OnLike">
         Like
         <md-tooltip md-direction="bottom" v-if="wallet">
           You have
@@ -110,7 +110,7 @@ const POINT_O_ONE_LIKE = new BN(10).pow(new BN(16));
 
 function prettifyLikeCoinBalance(balance) {
   const amount = balance.balance.div(POINT_O_ONE_LIKE).toString(10);
-  return `${amount.slice(0, Math.max(0, amount.length - 2))}.${amount.slice(-2)}`;
+  return `${amount.slice(0, Math.max(0, amount.length - 2)) || 0}.${amount.slice(-2)}`;
 }
 
 export default {

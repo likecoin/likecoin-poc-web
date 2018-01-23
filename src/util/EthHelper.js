@@ -75,6 +75,7 @@ class EthHelper {
         /* eslint-disable no-await-in-loop */
         await timeout(1000);
         txReceipt = await this.eth.getTransactionReceipt(txHash);
+        if (txReceipt && (txReceipt.status === 0 || txReceipt.status === '0x0')) throw new Error('Transaction failed');
       } catch (err) {
         console.log(`ERROR: ${err}`);
         if (cb) cb(err);
