@@ -117,7 +117,7 @@ export default {
         this.vList = this.newList;
         this.sortedLikedList = decodeList.slice(0);
         this.sortedLikedList.sort((a, b) => likeCounts[b.id] - likeCounts[a.id]);
-        if (this.activeTab) this.onTabChange(this.activeTab);
+        if (this.activeTab) this.onTabChange(parseInt(this.activeTab, 10));
       })
       .catch((response) => {
         // error callback
