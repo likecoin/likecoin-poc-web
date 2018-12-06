@@ -23,7 +23,7 @@
 
 <script>
 import * as api from '@/api/api';
-import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS, RINKEBY_ID } from '@/constant/contract/likemedia';
+import { LIKE_MEDIA_ABI, LIKE_MEDIA_ADDRESS } from '@/constant/contract/likemedia';
 import MdIpfsImage from './MdIpfsImage';
 import D3ViewAll from './D3ViewAll';
 
@@ -87,7 +87,7 @@ export default {
         }],
         id: Math.floor(Math.random() * 100000) + 10,
       };
-      api.apiPostRinkeby(RINKEBY_ID, data).then((response) => {
+      api.apiPostRinkeby(data).then((response) => {
         // get body data
         const decodeList = [];
         const likeCounts = {};

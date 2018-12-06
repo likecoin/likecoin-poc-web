@@ -22,5 +22,5 @@ export const apiPostLike = (uid, payload) =>
 
 export const apiGetMetadata = uid => axios.get(`${HOST}/query/${uid}`);
 
-export const apiPostRinkeby = (id, data) =>
-  axios.post(`https://rinkeby.infura.io/${id}`, data);
+export const apiPostRinkeby = data =>
+  axios.post('https://rinkeby.infura.io/v3/66d5ee46e5a14aa387c9e4fbc662727f', data);

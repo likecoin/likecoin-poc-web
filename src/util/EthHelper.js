@@ -14,7 +14,7 @@ function timeout(ms) {
 class EthHelper {
 
   initApp(errCb, clearErrCb) {
-    const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io'));
+    const eth = new Eth(new Eth.HttpProvider('https://rinkeby.infura.io/v3/66d5ee46e5a14aa387c9e4fbc662727f'));
     this.startApp(eth);
     this.errCb = errCb;
     this.clearErrCb = clearErrCb;
