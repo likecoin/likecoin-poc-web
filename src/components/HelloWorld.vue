@@ -3,9 +3,7 @@
     <md-toolbar id="main-nav" class="nav">
       <router-link exact to="/">
         <img class="logo"
-            src="../assets/like.png"
-            srcset="../assets/like@2x.png 2x,
-                    ../assets/like@3x.png 3x" />
+            src="../assets/like.png" />
       </router-link>
       <md-layout class="title-box"><h1 class="title">{{ title }}</h1>
         <div class="colorbar1" />
@@ -19,7 +17,7 @@
     <div class="colorbar2" />
     <footer>
       <md-toolbar id="footer-nav" class="md-transparent">
-      <md-layout md-flex-medium="100" md-align-medium="center"><a href="https://like.community/">by LikeCoin Foundation</a></md-layout>
+      <md-layout md-flex-medium="100" md-align-medium="center"><a href="https://like.co/">by LikeCoin Foundation</a></md-layout>
       <md-layout md-flex md-flex-medium="100" md-align="center" md-vertical-align="center">
       <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"><md-button>
           <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
